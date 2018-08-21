@@ -1,0 +1,3 @@
+rootProject.name = 'evnt'
+include 'evnt-api', 'evnt-webapp'
+

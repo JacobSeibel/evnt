@@ -1,0 +1,7 @@
+@import "../valo/valo.scss";
+
+@mixin evntwebapp {
+	@include valo;
+
+	/* Add your theme selectors here */
+}
