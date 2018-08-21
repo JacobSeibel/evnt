@@ -1,0 +1,80 @@
+import com.basf.gb.cube.seq.config.CurrentUser;
+import com.basf.gb.cube.seq.domain.cassette.CassetteRole;
+import com.basf.gb.cube.seq.domain.vector.Vector;
+import com.basf.gb.cube.seq.rest.RestUriConstants;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * Created by jseibel on 06/20/17.
+ */
+
+@Slf4j
+@Service
+@Scope("singleton")
+@Lazy
+public class CassetteRoleDelegateService extends AbstractDelegateService {
+
+  private static final String API_BASE = RestUriConstants.SEQMASTER_API_HTTP+"://" + RestUriConstants.SEQMASTER_API_HOST + ":" + RestUriConstants.SEQMASTER_API_PORT;
+  private static final String CASSETTE_ROLE_BASE = API_BASE + RestUriConstants.CASSETTE_ROLE;
+
+  @Autowired
+  public CassetteRoleDelegateService(CurrentUser currentUser, OAuth2ClientContext oauth2Context) {
+    super(currentUser, oauth2Context);
+  }
+
+  public List<CassetteRole> findAllCassetteRoles(){
+    String url = CASSETTE_ROLE_BASE + "find_all";
+
+    log.debug("Preparing to make a REST call to {}", url);
+
+    OAuth2RestOperations restTemplate = restTemplate();
+    ParameterizedTypeReference<List<CassetteRole>> responseType = new ParameterizedTypeReference<List<CassetteRole>>() {
+    };
+
+    ResponseEntity<List<CassetteRole>> response = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
+
+    return response.getBody();
+
+  }
+
+  public List<CassetteRole> findAllActiveCassetteRoles(){
+    String url = CASSETTE_ROLE_BASE + "active";
+
+    log.debug("Preparing to make a REST call to {}", url);
+
+    OAuth2RestOperations restTemplate = restTemplate();
+    ParameterizedTypeReference<List<CassetteRole>> responseType = new ParameterizedTypeReference<List<CassetteRole>>() {};
+
+    ResponseEntity<List<CassetteRole>> response = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
+
+    return response.getBody();
+  }
+
+  public CassetteRole findCassetteRoleByPk(int pk){
+    String url = CASSETTE_ROLE_BASE + pk;
+
+    log.debug("Preparing to make a REST call to {}", url);
+
+    OAuth2RestOperations restTemplate = restTemplate();
+    ParameterizedTypeReference<CassetteRole> responseType = new ParameterizedTypeReference<CassetteRole>() {
+    };
+
+    ResponseEntity<CassetteRole> response = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
+
+    return response.getBody();
+
+  }
+}

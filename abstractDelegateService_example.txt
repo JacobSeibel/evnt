@@ -1,0 +1,45 @@
+import com.basf.gb.cube.seq.config.CurrentUser;
+import com.basf.gb.cube.seq.util.OAuth2;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
+
+import static com.basf.gb.cube.util.ConsolePrinters.*;
+import static com.basf.gb.cube.fj.TryOps.tryOption;
+import com.basf.gb.cube.seq.vaadinui.entity.User;
+
+
+/**
+ * Created by msevik on 12/13/2015.
+ */
+@Slf4j
+public abstract class AbstractDelegateService {
+
+  protected OAuth2ClientContext oauth2Context;
+  protected CurrentUser currentUser;
+
+  public AbstractDelegateService(CurrentUser currentUser, OAuth2ClientContext oauth2Context) {
+    this.currentUser = currentUser;
+    this.oauth2Context = oauth2Context;
+
+    line();
+    pfmt("[DELEGATE - STARTED]  %s\n\n\n\n", delegateName() );
+  }
+
+  protected OAuth2RestOperations restTemplate() {
+
+    User u = currentUser.get();
+
+    line();
+    pfmt("[DELEGATE]  %s -> %s\n\n\n\n", delegateName(), tryOption(() -> u.getUsername()).orSome("ANONYMOUS")  );
+
+    OAuth2ProtectedResourceDetails resourceDetails = OAuth2.resource(u);
+
+    return new OAuth2RestTemplate(resourceDetails, this.oauth2Context);
+  }
+
+
+  public String delegateName() { return getClass().getSimpleName(); }
+}
