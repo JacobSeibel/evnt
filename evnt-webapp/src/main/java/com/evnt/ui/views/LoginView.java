@@ -10,7 +10,7 @@ import javax.annotation.PostConstruct;
 
 @SpringView(name = LoginView.VIEW_NAME)
 public class LoginView extends VerticalLayout implements View {
-    public static final String VIEW_NAME = "";
+    public static final String VIEW_NAME = "login";
 
     @PostConstruct
     void init() {
