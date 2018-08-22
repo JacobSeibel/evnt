@@ -20,4 +20,13 @@
         from
             user
     </select>
+
+    <select id="findByUsername" resultMap="userResultMapper">
+        select
+            *
+        from
+            user
+        where
+            username = #{username}
+    </select>
 </mapper>

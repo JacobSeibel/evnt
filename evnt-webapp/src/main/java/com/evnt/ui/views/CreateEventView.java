@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 
 @Slf4j
-@SpringView(name = HomeView.VIEW_NAME)
-public class HomeView extends VerticalLayout implements View {
-    public static final String VIEW_NAME = "home";
+@SpringView(name = CreateEventView.VIEW_NAME)
+public class CreateEventView extends VerticalLayout implements View {
+    public static final String VIEW_NAME = "create-event";
 
     @Autowired
     private UserDelegateService userService;
@@ -24,7 +24,7 @@ public class HomeView extends VerticalLayout implements View {
     void init() {
         StringBuilder sb = new StringBuilder();
         for(User u : userService.findAll()){
-            sb.append(u.getUsername());
+            sb.append(u.getFirstName()).append(" ").append(u.getLastName());
         }
         addComponent(new Label(sb.toString()));
     }

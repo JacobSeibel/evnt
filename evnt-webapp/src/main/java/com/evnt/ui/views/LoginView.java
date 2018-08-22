@@ -1,24 +1,81 @@
 package com.evnt.ui.views;
 
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener;
+import com.evnt.spring.security.UserAuthenticationService;
+import com.evnt.ui.EvntWebappUI;
+import com.evnt.ui.components.GoToMainViewLink;
+import com.evnt.ui.events.NavigationEvent;
+import com.google.common.eventbus.EventBus;
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.icons.VaadinIcons;
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
+import com.vaadin.ui.Button.ClickEvent;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
-import javax.annotation.PostConstruct;
+@SpringView(name = LoginView.NAME)
+public class LoginView extends AbstractView implements Button.ClickListener {
 
-@SpringView(name = LoginView.VIEW_NAME)
-public class LoginView extends VerticalLayout implements View {
-    public static final String VIEW_NAME = "login";
+    public final static String NAME = "login";
 
-    @PostConstruct
-    void init() {
-        addComponent(new Label("This is the default view"));
+    @Autowired
+    private UserAuthenticationService userAuthenticationService;
+
+    private String forwardTo;
+    private TextField nameTF;
+    private PasswordField passwordTF;
+
+    public LoginView() {
+        addComponent(new Label(
+                "Please enter your credentials:"));
+        nameTF = new TextField();
+        nameTF.setRequiredIndicatorVisible(true);
+        nameTF.focus();
+
+        passwordTF = new PasswordField();
+        passwordTF.setRequiredIndicatorVisible(true);
+
+        addComponent(nameTF);
+        addComponent(passwordTF);
+
+        Button loginButton = new Button("Login");
+        loginButton.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+        loginButton.addClickListener(this);
+        loginButton.setIcon(VaadinIcons.SIGN_IN);
+        addComponent(loginButton);
+
+        addComponent(new GoToMainViewLink());
     }
 
     @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
-        // This view is constructed in the init() method()
+    public void enter(ViewChangeEvent event) {
+        forwardTo = event.getParameters();
+    }
+
+    @Override
+    public void buttonClick(ClickEvent event) {
+        if (nameTF.getValue() != null && !nameTF.getValue().isEmpty() && passwordTF.getValue() != null && !passwordTF.isEmpty()) {
+            Authentication authentication = new UsernamePasswordAuthenticationToken(nameTF.getValue(), passwordTF.getValue());
+            if (userAuthenticationService.loginUser(authentication)) {
+                EventBus eventbus = EvntWebappUI.getCurrent().getEventbus();
+                eventbus.post(new NavigationEvent(this, forwardTo));
+            } else {
+                passwordTF.setValue("");
+            }
+        } else {
+            if (nameTF.isEmpty()) {
+                nameTF.setErrorHandler(error -> Notification.show("Username required!", Notification.Type.ERROR_MESSAGE));
+            }
+            if (passwordTF.isEmpty()) {
+                passwordTF.setErrorHandler(error -> Notification.show("Password required!", Notification.Type.ERROR_MESSAGE));
+            }
+        }
+    }
+
+    public static String loginPathForRequestedView(String requestedViewName) {
+        return NAME + "/" + requestedViewName;
     }
 }

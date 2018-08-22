@@ -1,52 +1,105 @@
 package com.evnt.ui;
 
-import com.evnt.ui.views.TestView;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewDisplay;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.spring.annotation.SpringUI;
-import com.vaadin.spring.annotation.SpringViewDisplay;
-import com.vaadin.ui.*;
+import com.evnt.domain.User;
+import com.evnt.persistence.UserDelegateService;
+import com.evnt.persistence.VaadinUIService;
+import com.evnt.persistence.VaadinUIServiceImpl;
+import com.evnt.ui.events.LogoutEvent;
+import com.evnt.ui.events.NavigationEvent;
+import com.evnt.ui.security.SecurityErrorHandler;
+import com.evnt.ui.security.ViewAccessDecisionManager;
+import com.evnt.ui.views.ErrorView;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
-import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.navigator.Navigator;
+import com.vaadin.server.*;
+import com.vaadin.spring.annotation.SpringUI;
+import com.vaadin.spring.navigator.SpringViewProvider;
+import com.vaadin.ui.UI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-@SpringUI
-@SpringViewDisplay
+import javax.annotation.PostConstruct;
+import javax.servlet.ServletException;
+
+@SpringUI(path = "")
 @Theme("valo")
-public class EvntWebappUI extends UI implements ViewDisplay{
-	private Panel springViewDisplay;
+@PreserveOnRefresh
+public class EvntWebappUI extends UI {
 
-	@Override
-	protected void init(VaadinRequest request) {
-		final VerticalLayout root = new VerticalLayout();
-		root.setSizeFull();
-		setContent(root);
+	private static final Logger LOG = LoggerFactory.getLogger(EvntWebappUI.class);
+	private static final VaadinUIService uiService = new VaadinUIServiceImpl();    @Autowired
+	private SpringViewProvider viewProvider;
 
-		final CssLayout navigationBar = new CssLayout();
-		navigationBar.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-		navigationBar.addComponent(createNavigationButton("View Scoped View",
-				TestView.VIEW_NAME));
-		root.addComponent(navigationBar);
+	@Autowired
+	private ViewAccessDecisionManager viewAccessDecisionManager;
 
-		springViewDisplay = new Panel();
-		springViewDisplay.setSizeFull();
-		root.addComponent(springViewDisplay);
-		root.setExpandRatio(springViewDisplay, 1.0f);
+	@Autowired
+	private UserDelegateService userService;
 
-	}
+	private EventBus eventbus;
 
-	private Button createNavigationButton(String caption, final String viewName) {
-		Button button = new Button(caption);
-		button.addStyleName(ValoTheme.BUTTON_SMALL);
-		// If you didn't choose Java 8 when creating the project, convert this
-		// to an anonymous listener class
-		button.addClickListener(event -> getUI().getNavigator().navigateTo(viewName));
-		return button;
+	public static EvntWebappUI getCurrent() {
+		return (EvntWebappUI) UI.getCurrent();
 	}
 
 	@Override
-	public void showView(View view) {
-		springViewDisplay.setContent((Component) view);
+	protected void init(VaadinRequest vaadinRequest) {
+		buildNavigator();
+		VaadinSession.getCurrent().setErrorHandler(new SecurityErrorHandler(eventbus, getNavigator()));
+
+		viewAccessDecisionManager.checkAccessRestrictionForRequestedView(getNavigator());
+
+		Page.getCurrent().setTitle("Vaadin and Spring Security Demo");
+	}
+
+	private void buildNavigator() {
+		Navigator navigator = new Navigator(this, this);
+		navigator.addProvider(viewProvider);
+		navigator.setErrorView(ErrorView.class);
+		setNavigator(navigator);
+	}
+
+	public EventBus getEventbus() {
+		return eventbus;
+	}
+
+	public User getCurrentUser() {
+		if (isUserAnonymous()) {
+			return null;
+		} else {
+			return userService.findByUsername((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		}
+	}
+
+	@PostConstruct
+	private void initEventbus() {
+		eventbus = new EventBus("main");
+		eventbus.register(this);
+	}
+
+	public boolean isUserAnonymous() {
+		return SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken;
+	}
+
+	@Subscribe
+	public void userLoggedOut(LogoutEvent event) throws ServletException {
+		((VaadinServletRequest) VaadinService.getCurrentRequest()).getHttpServletRequest().logout();
+		VaadinSession.getCurrent().close();
+		Page.getCurrent().setLocation("/");
+	}
+
+	@Subscribe
+	public void handleNavigation(NavigationEvent event) {
+		getNavigator().navigateTo(event.getTarget());
+	}
+
+	public static VaadinUIService getUiService() {
+		return uiService;
 	}
 }

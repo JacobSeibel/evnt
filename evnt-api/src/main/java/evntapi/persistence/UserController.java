@@ -18,7 +18,12 @@ public class UserController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<User> findAll(){
-        List<User> test = userService.findAll();
-        return test;
+        return userService.findAll();
+    }
+
+    @GetMapping("/username/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    public User findByUsername(@PathVariable("username") String username){
+        return userService.findByUsername(username);
     }
 }
