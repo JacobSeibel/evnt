@@ -18,7 +18,12 @@ public class UserAuthenticationService {
         try {
             final Authentication authentication = authenticationManager.authenticate(authenticationRequest);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return true;
+            if(authentication.isAuthenticated()) {
+                return true;
+            }else{
+                Notification.show("Authentication error", "Password is incorrect", Notification.Type.ERROR_MESSAGE);
+                return false;
+            }
         } catch (AuthenticationException aExc) {
             Notification.show("Authentication error", "Could not authenticate", Notification.Type.ERROR_MESSAGE);
             return false;

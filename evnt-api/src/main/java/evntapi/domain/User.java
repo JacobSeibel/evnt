@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.File;
+import java.util.List;
 
 @Getter @Setter @ToString
 public class User {
@@ -18,4 +19,6 @@ public class User {
     private boolean isActive;
     private String firstName;
     private String lastName;
+
+    private List<SecurityRole> securityRoles;
 }

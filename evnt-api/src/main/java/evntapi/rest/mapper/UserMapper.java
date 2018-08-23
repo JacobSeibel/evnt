@@ -1,12 +1,10 @@
-package evntapi.persistence;
+package evntapi.rest.mapper;
 
 import evntapi.domain.User;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-public interface UserService {
+public interface UserMapper {
     List<User> findAll();
     User findByUsername(String username);
 }

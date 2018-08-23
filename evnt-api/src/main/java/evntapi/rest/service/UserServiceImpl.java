@@ -1,7 +1,7 @@
-package evntapi.persistence;
+package evntapi.rest.service;
 
 import evntapi.domain.User;
-import evntapi.persistence.mapper.UserMapper;
+import evntapi.rest.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

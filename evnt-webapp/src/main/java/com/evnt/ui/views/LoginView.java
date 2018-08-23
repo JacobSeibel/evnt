@@ -8,6 +8,7 @@ import com.google.common.eventbus.EventBus;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
@@ -17,7 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 @SpringView(name = LoginView.NAME)
-public class LoginView extends AbstractView implements Button.ClickListener {
+public class LoginView extends AbstractView {
 
     public final static String NAME = "login";
 
@@ -43,9 +44,29 @@ public class LoginView extends AbstractView implements Button.ClickListener {
 
         Button loginButton = new Button("Login");
         loginButton.setClickShortcut(ShortcutAction.KeyCode.ENTER);
-        loginButton.addClickListener(this);
+        loginButton.addClickListener(click -> {
+            if (nameTF.getValue() != null && !nameTF.getValue().isEmpty() && passwordTF.getValue() != null && !passwordTF.isEmpty()) {
+                Authentication authentication = new UsernamePasswordAuthenticationToken(nameTF.getValue(), passwordTF.getValue());
+                if (userAuthenticationService.loginUser(authentication)) {
+                    EventBus eventbus = EvntWebappUI.getCurrent().getEventbus();
+                    eventbus.post(new NavigationEvent(this, forwardTo));
+                } else {
+                    passwordTF.setValue("");
+                }
+            } else {
+                if (nameTF.isEmpty()) {
+                    nameTF.setErrorHandler(error -> Notification.show("Username required!", Notification.Type.ERROR_MESSAGE));
+                }
+                if (passwordTF.isEmpty()) {
+                    passwordTF.setErrorHandler(error -> Notification.show("Password required!", Notification.Type.ERROR_MESSAGE));
+                }
+            }
+        });
         loginButton.setIcon(VaadinIcons.SIGN_IN);
         addComponent(loginButton);
+
+        Link signUpLink = new Link("Don't have an account? Sign up now!", new ExternalResource("#!" + CreateAccountView.NAME));
+        addComponent(signUpLink);
 
         addComponent(new GoToMainViewLink());
     }
@@ -53,26 +74,6 @@ public class LoginView extends AbstractView implements Button.ClickListener {
     @Override
     public void enter(ViewChangeEvent event) {
         forwardTo = event.getParameters();
-    }
-
-    @Override
-    public void buttonClick(ClickEvent event) {
-        if (nameTF.getValue() != null && !nameTF.getValue().isEmpty() && passwordTF.getValue() != null && !passwordTF.isEmpty()) {
-            Authentication authentication = new UsernamePasswordAuthenticationToken(nameTF.getValue(), passwordTF.getValue());
-            if (userAuthenticationService.loginUser(authentication)) {
-                EventBus eventbus = EvntWebappUI.getCurrent().getEventbus();
-                eventbus.post(new NavigationEvent(this, forwardTo));
-            } else {
-                passwordTF.setValue("");
-            }
-        } else {
-            if (nameTF.isEmpty()) {
-                nameTF.setErrorHandler(error -> Notification.show("Username required!", Notification.Type.ERROR_MESSAGE));
-            }
-            if (passwordTF.isEmpty()) {
-                passwordTF.setErrorHandler(error -> Notification.show("Password required!", Notification.Type.ERROR_MESSAGE));
-            }
-        }
     }
 
     public static String loginPathForRequestedView(String requestedViewName) {

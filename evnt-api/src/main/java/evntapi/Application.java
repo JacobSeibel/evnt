@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 @SpringBootApplication
 @Configuration
-@MapperScan(basePackages = "evntapi.persistence.mapper", sqlSessionFactoryRef = "sqlSessionFactory")
+@MapperScan(basePackages = "evntapi.rest.mapper", sqlSessionFactoryRef = "sqlSessionFactory")
 @ImportResource({"classpath*:applicationContext.xml"})
 public class Application {
 

@@ -2,31 +2,52 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="evntapi.persistence.mapper.UserMapper">
-    <resultMap id="userResultMapper" type="evntapi.domain.User">
-        <id     property="pk"         column="pk"/>
-        <result property="username"   column="username"/>
-        <result property="email"      column="email"/>
-        <result property="password"   column="password"/>
-        <result property="cellNumber" column="cell_number"/>
-        <result property="isActive"   column="is_active"/>
-        <result property="firstName"  column="first_name"/>
-        <result property="lastName"   column="last_name"/>
+<mapper namespace="evntapi.rest.mapper.UserMapper">
+    <resultMap id="userResultMap" type="evntapi.domain.User">
+        <id     property="pk"         column="user_pk"/>
+        <result property="username"   column="user_username"/>
+        <result property="email"      column="user_email"/>
+        <result property="password"   column="user_password"/>
+        <result property="cellNumber" column="user_cell_number"/>
+        <result property="isActive"   column="user_is_active"/>
+        <result property="firstName"  column="user_first_name"/>
+        <result property="lastName"   column="user_last_name"/>
+
+        <collection property="securityRoles" resultMap="evntapi.rest.mapper.SecurityRoleMapper.securityRoleResultMap"/>
     </resultMap>
 
-    <select id="findAll" resultMap="userResultMapper">
+    <sql id="userSelectCols">
+        user.pk as user_pk,
+        user.username as user_username,
+        user.email as user_email,
+        user.password as user_password,
+        user.cell_number as user_cell_number,
+        user.is_active as user_is_active,
+        user.first_name as user_first_name,
+        user.last_name as user_last_name,
+
+        <include refid="evntapi.rest.mapper.SecurityRoleMapper.securityRoleSelectCols"/>
+    </sql>
+
+    <sql id="userTables">
+        user
+        left join user_security_role usr on (usr.user_fk = user.pk)
+        left join security_role securityRole on (securityRole.pk = usr.security_role_fk)
+    </sql>
+
+    <select id="findAll" resultMap="userResultMap">
         select
-            *
+            <include refid="userSelectCols"/>
         from
-            user
+            <include refid="userTables"/>
     </select>
 
-    <select id="findByUsername" resultMap="userResultMapper">
+    <select id="findByUsername" resultMap="userResultMap">
         select
-            *
+            <include refid="userSelectCols"/>
         from
-            user
+            <include refid="userTables"/>
         where
-            username = #{username}
+            user.username = #{username}
     </select>
 </mapper>

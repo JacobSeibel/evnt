@@ -1,9 +1,10 @@
-package evntapi.persistence;
+package evntapi.rest.controller;
 
 import evntapi.domain.User;
+import evntapi.rest.RestConstants;
+import evntapi.rest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

@@ -11,7 +11,7 @@ import java.beans.Transient;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 @Getter @Setter @ToString
@@ -19,7 +19,7 @@ public class User implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String USE_APP_ROLE = "USE-APP-ROLE";
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     private int pk;
     private String username;
@@ -31,6 +31,7 @@ public class User implements UserDetails {
     private boolean isActive;
     private String firstName;
     private String lastName;
+    private List<SecurityRole> securityRoles;
 
     private boolean enabled = true;
     private boolean accountNonLocked = true;
@@ -40,10 +41,7 @@ public class User implements UserDetails {
     @SuppressWarnings("serial")
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> result = new ArrayList<>();
-        result.add((GrantedAuthority) () -> USE_APP_ROLE);
-
-        return result;
+        return securityRoles;
     }
 
     @Override
