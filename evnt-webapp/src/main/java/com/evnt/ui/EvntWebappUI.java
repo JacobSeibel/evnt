@@ -55,7 +55,7 @@ public class EvntWebappUI extends UI {
 
 		viewAccessDecisionManager.checkAccessRestrictionForRequestedView(getNavigator());
 
-		Page.getCurrent().setTitle("Vaadin and Spring Security Demo");
+		Page.getCurrent().setTitle("evnt");
 	}
 
 	private void buildNavigator() {

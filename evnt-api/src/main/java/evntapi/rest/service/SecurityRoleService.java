@@ -8,4 +8,5 @@ import java.util.List;
 @Service
 public interface SecurityRoleService {
     List<SecurityRole> findAll();
+    SecurityRole findByPk(int pk);
 }

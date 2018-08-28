@@ -9,4 +9,6 @@ import java.util.List;
 public interface UserService {
     List<User> findAll();
     User findByUsername(String username);
+    User findByEmail(String email);
+    void insert(User user);
 }

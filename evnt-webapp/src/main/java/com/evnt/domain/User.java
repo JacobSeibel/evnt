@@ -1,5 +1,6 @@
 package com.evnt.domain;
 
+import com.evnt.persistence.SecurityRoleDelegateService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -19,18 +20,17 @@ public class User implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String ROLE_ADMIN = "ROLE_ADMIN";
-
     private int pk;
     private String username;
     private String password;
     private String email;
     private String cellNumber;
     //TODO: Figure this out
-    private File profilePic;
-    private boolean isActive;
+    private String profilePic;
+    private boolean isActive = true;
     private String firstName;
     private String lastName;
+
     private List<SecurityRole> securityRoles;
 
     private boolean enabled = true;
@@ -73,5 +73,14 @@ public class User implements UserDetails {
 
     public String getFullName(){
         return firstName + " " + lastName;
+    }
+
+    public void addSecurityRole(Integer rolePk, SecurityRoleDelegateService securityRoleService){
+        addSecurityRole(securityRoleService.findByPk(rolePk));
+    }
+
+    public void addSecurityRole(SecurityRole role){
+        if(securityRoles == null) securityRoles = new ArrayList<>();
+        securityRoles.add(role);
     }
 }

@@ -5,14 +5,14 @@ import com.vaadin.navigator.View;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PreDestroy;
 
+@Slf4j
 public abstract class AbstractView extends Panel implements View {
-    private Logger LOG = LoggerFactory.getLogger(AbstractView.class);
-
     private VerticalLayout layout;
 
     public AbstractView() {
@@ -33,7 +33,7 @@ public abstract class AbstractView extends Panel implements View {
 
     @PreDestroy
     public void destroy() {
-        LOG.debug("About to destroy {}", getClass().getName());
+        log.debug("About to destroy {}", getClass().getName());
         EvntWebappUI.getCurrent().getEventbus().unregister(this);
     }
 }

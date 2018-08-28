@@ -25,4 +25,13 @@
         from
             <include refid="securityRoleTables"/>
     </select>
+
+    <select id="findByPk" resultMap="securityRoleResultMap">
+        select
+            <include refid="securityRoleSelectCols"/>
+        from
+            <include refid="securityRoleTables"/>
+        where
+            securityRole.pk = #{pk}
+    </select>
 </mapper>

@@ -50,4 +50,35 @@
         where
             user.username = #{username}
     </select>
+
+    <select id="findByEmail" resultMap="userResultMap">
+        select
+            <include refid="userSelectCols"/>
+        from
+            <include refid="userTables"/>
+        where
+            lower(user.email) = lower(#{email})
+    </select>
+
+    <insert id="insert" parameterType="evntapi.domain.User" useGeneratedKeys="true" keyProperty="pk" keyColumn="PK">
+        insert into
+            user(username, password, email, cell_number, profile_pic, is_active, first_name, last_name)
+        values
+            (#{username},
+            #{password},
+            #{email},
+            #{cellNumber},
+            #{profilePic},
+            #{isActive},
+            #{firstName},
+            #{lastName})
+    </insert>
+
+    <insert id="insertUserSecurityRole">
+        insert into
+            user_security_role(user_fk, security_role_fk)
+        values
+            (#{userFk},
+            #{securityRoleFk})
+    </insert>
 </mapper>

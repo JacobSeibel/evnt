@@ -27,4 +27,16 @@ public class UserController {
     public User findByUsername(@PathVariable("username") String username){
         return userService.findByUsername(username);
     }
+
+    @GetMapping("/email/{email}")
+    @ResponseStatus(HttpStatus.OK)
+    public User findByEmail(@PathVariable("email") String email){
+        return userService.findByEmail(email);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void insert(@RequestBody User user){
+        userService.insert(user);
+    }
 }

@@ -16,4 +16,9 @@ public class SecurityRoleServiceImpl implements SecurityRoleService{
     public List<SecurityRole> findAll() {
         return mapper.findAll();
     }
+
+    @Override
+    public SecurityRole findByPk(int pk) {
+        return mapper.findByPk(pk);
+    }
 }

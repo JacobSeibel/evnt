@@ -15,7 +15,7 @@ public class User {
     private String email;
     private String cellNumber;
     //TODO: Figure this out
-    private File profilePic;
+    private String profilePic;
     private boolean isActive;
     private String firstName;
     private String lastName;

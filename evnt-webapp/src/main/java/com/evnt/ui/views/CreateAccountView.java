@@ -1,6 +1,8 @@
 package com.evnt.ui.views;
 
+import com.evnt.domain.SecurityRole;
 import com.evnt.domain.User;
+import com.evnt.persistence.SecurityRoleDelegateService;
 import com.evnt.persistence.UserDelegateService;
 import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
@@ -29,6 +31,8 @@ public class CreateAccountView extends AbstractView {
     private UserAuthenticationService userAuthenticationService;
     @Autowired
     private UserDelegateService userService;
+    @Autowired
+    private SecurityRoleDelegateService securityService;
 
     private String forwardTo;
 
@@ -47,13 +51,14 @@ public class CreateAccountView extends AbstractView {
         binder.forField(confirmPasswordField)
                 .asRequired("Please confirm password!")
                 .withValidator(str -> str.equals(passwordField.getValue()), "Passwords do not match!")
-                .bind(User::getPassword, User::setPassword);
+                .bind(User::getPassword, User::setUnencryptedPassword);
         TextField emailField = new TextField("Email Address");
         binder.forField(emailField)
                 .asRequired("Email is required!")
                 .withValidator(new EmailValidator("Invalid email address!"))
-//                .withValidator(str -> userService.findByEmail(str) == null, "An account is already registered for this email!")
+                .withValidator(str -> userService.findByEmail(str) == null, "An account is already registered for this email!")
                 .bind(User::getEmail, User::setEmail);
+        //TODO: Phone number validation and hint to help user type number correctly
         TextField cellNumberField = new TextField("Cell Phone Number");
         binder.forField(cellNumberField)
                 .bind(User::getCellNumber, User::setCellNumber);
@@ -64,6 +69,17 @@ public class CreateAccountView extends AbstractView {
         binder.forField(lastNameField)
                 .bind(User::getLastName, User::setLastName);
 
+        Button signUpButton = new Button("Sign Up");
+        signUpButton.setEnabled(false);
+        signUpButton.addClickListener(click -> {
+            User user = new User();
+            binder.writeBeanIfValid(user);
+            createAccount(user, passwordField.getValue());
+        });
+        binder.addValueChangeListener(change ->{
+            signUpButton.setEnabled(binder.isValid());
+        });
+
         addComponent(usernameField);
         addComponent(passwordField);
         addComponent(confirmPasswordField);
@@ -71,11 +87,21 @@ public class CreateAccountView extends AbstractView {
         addComponent(cellNumberField);
         addComponent(firstNameField);
         addComponent(lastNameField);
+        addComponent(signUpButton);
+    }
 
-        Button signUpButton = new Button("Sign Up");
-        signUpButton.addClickListener(click -> {
+    private void createAccount(User user, String unencryptedPassword){
+        user.addSecurityRole(SecurityRole.ROLE_USER, securityService);
+        userService.insert(user);
+        Notification success = new Notification("Successfully created user "+user.getUsername());
+        success.setDelayMsec(3000);
+        success.show(EvntWebappUI.getCurrent().getPage());
 
-        });
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), unencryptedPassword);
+        if (userAuthenticationService.loginUser(authentication)) {
+            EventBus eventbus = EvntWebappUI.getCurrent().getEventbus();
+            eventbus.post(new NavigationEvent(this, forwardTo));
+        }
     }
 
     @Override

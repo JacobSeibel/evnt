@@ -70,12 +70,7 @@ public class MainView extends AbstractView {
         addComponent(horizontalLayout);
 
         Button adminButton = new Button("Admin Button");
-        adminButton.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                adminService.doSomeAdministrationTask();
-            }
-        });
+        adminButton.addClickListener((Button.ClickListener) event -> adminService.doSomeAdministrationTask());
         addComponent(adminButton);
 
         registerWithEventbus();

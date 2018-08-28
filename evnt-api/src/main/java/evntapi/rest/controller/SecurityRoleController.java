@@ -21,4 +21,10 @@ public class SecurityRoleController {
     public List<SecurityRole> findAll(){
         return securityRoleService.findAll();
     }
+
+    @GetMapping("/{pk}")
+    @ResponseStatus(HttpStatus.OK)
+    public SecurityRole findByPk(@PathVariable("pk") int pk){
+        return securityRoleService.findByPk(pk);
+    }
 }
