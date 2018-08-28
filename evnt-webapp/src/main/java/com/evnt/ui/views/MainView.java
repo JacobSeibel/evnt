@@ -23,22 +23,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @SpringView(name = MainView.NAME)
 public class MainView extends AbstractView {
 
-    private AdminService adminService;
     private UserDelegateService userService;
 
     public final static String NAME = "main";
 
     private String welcomeLabelText;
-    private LogoutLink logoutLink;
 
     public MainView(
-            @Autowired
-            UserDelegateService userService,
-            @Autowired
-            AdminService adminService
+            @Autowired AdminService adminService,
+            @Autowired UserDelegateService userService
     ) {
+        super(adminService);
+
         this.userService = userService;
-        this.adminService = adminService;
 
         welcomeLabelText = "";
 
@@ -46,32 +43,6 @@ public class MainView extends AbstractView {
         Label welcomeLabel = new Label(welcomeLabelText, ContentMode.HTML);
 
         addComponent(welcomeLabel);
-
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.setSpacing(true);
-        final Link profileLink = new Link("Your Profile", new ExternalResource("#!" + ProfileView.NAME));
-        profileLink.setIcon(VaadinIcons.USER);
-        horizontalLayout.addComponent(profileLink);
-        final Link invalidLink = new Link("Go to some invalid page", new ExternalResource("#!invalid_page"));
-        invalidLink.setIcon(VaadinIcons.BOMB);
-        horizontalLayout.addComponent(invalidLink);
-
-        logoutLink = new LogoutLink();
-        logoutLink.updateVisibility();
-        horizontalLayout.addComponent(logoutLink);
-
-        Link adminLink = new Link("Admin page", new ExternalResource("#!" + AdminView.NAME));
-        adminLink.setIcon(VaadinIcons.LOCK);
-        horizontalLayout.addComponent(adminLink);
-
-        Link aboutLink = new Link("About", new ExternalResource("#!" + AboutView.NAME));
-        aboutLink.setIcon(VaadinIcons.QUESTION_CIRCLE);
-        horizontalLayout.addComponent(aboutLink);
-        addComponent(horizontalLayout);
-
-        Button adminButton = new Button("Admin Button");
-        adminButton.addClickListener((Button.ClickListener) event -> adminService.doSomeAdministrationTask());
-        addComponent(adminButton);
 
         registerWithEventbus();
     }
@@ -87,19 +58,19 @@ public class MainView extends AbstractView {
                         : "<h1>Welcome " + username + "!</h1><hr/>";
     }
 
-    @Subscribe
-    public void userLoggedIn(UserLoggedInEvent event) {
-        updateWelcomeMessage();
-        logoutLink.updateVisibility();
-    }
-
-    @Subscribe
-    public void userLoggedOut(LogoutEvent event) {
-        updateWelcomeMessage();
-        logoutLink.updateVisibility();
+    @Override
+    public void enter(ViewChangeListener.ViewChangeEvent event) {
     }
 
     @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
+    public void userLoggedIn(UserLoggedInEvent event) {
+        super.userLoggedIn(event);
+        updateWelcomeMessage();
+    }
+
+    @Override
+    public void userLoggedOut(LogoutEvent event) {
+        super.userLoggedOut(event);
+        updateWelcomeMessage();
     }
 }

@@ -2,6 +2,7 @@ package com.evnt.ui.views;
 
 import com.evnt.domain.SecurityRole;
 import com.evnt.domain.User;
+import com.evnt.persistence.AdminService;
 import com.evnt.persistence.SecurityRoleDelegateService;
 import com.evnt.persistence.UserDelegateService;
 import com.evnt.spring.security.UserAuthenticationService;
@@ -36,7 +37,8 @@ public class CreateAccountView extends AbstractView {
 
     private String forwardTo;
 
-    public CreateAccountView() {
+    public CreateAccountView(@Autowired AdminService adminService) {
+        super(adminService);
         Binder<User> binder = new Binder<>();
 
         TextField usernameField = new TextField("Username");

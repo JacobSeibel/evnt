@@ -1,6 +1,7 @@
 package com.evnt.spring.security;
 
 import com.evnt.domain.User;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,10 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import java.util.ArrayList;
 import java.util.Collection;
 
+@Slf4j
 @Configuration
 @Order(200)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-
-    private static Logger LOG = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Autowired
     private UserDetailsService userDetailService;
@@ -66,10 +66,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return (request, response, exception) -> {
             final Throwable cause = exception.getCause();
-            LOG.error("An error occurred: {}", exception.getClass().getName());
+            log.error("An error occurred: {}", exception.getClass().getName());
             exception.printStackTrace();
             if (cause != null) {
-                LOG.error("        Caused by: {}", cause.getClass().getName());
+                log.error("        Caused by: {}", cause.getClass().getName());
             }
             response.sendRedirect("/error");
         };

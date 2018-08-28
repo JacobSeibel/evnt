@@ -1,5 +1,6 @@
 package com.evnt.ui.views;
 
+import com.evnt.persistence.AdminService;
 import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
 import com.evnt.ui.components.GoToMainViewLink;
@@ -31,7 +32,8 @@ public class LoginView extends AbstractView {
     private TextField nameTF;
     private PasswordField passwordTF;
 
-    public LoginView() {
+    public LoginView(@Autowired AdminService adminService) {
+        super(adminService);
         addComponent(new Label(
                 "Please enter your credentials:"));
         nameTF = new TextField();

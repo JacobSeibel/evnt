@@ -1,10 +1,12 @@
 package com.evnt.ui.views;
 
+import com.evnt.persistence.AdminService;
 import com.evnt.ui.components.GoToMainViewLink;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Label;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringView(name = ErrorView.NAME)
 public class ErrorView extends AbstractView {
@@ -13,7 +15,8 @@ public class ErrorView extends AbstractView {
 
     private String errorMessage;
 
-    public ErrorView() {
+    public ErrorView(@Autowired AdminService adminService) {
+        super(adminService);
         Label errorMessageLabel = new Label(errorMessage, ContentMode.HTML);
         addComponent(errorMessageLabel);
         addComponent(new GoToMainViewLink());

@@ -1,5 +1,6 @@
 package com.evnt.ui.views;
 
+import com.evnt.persistence.AdminService;
 import com.evnt.ui.EvntWebappUI;
 import com.evnt.ui.components.GoToMainViewLink;
 import com.evnt.ui.components.LogoutLink;
@@ -11,6 +12,7 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
 import javax.annotation.PostConstruct;
@@ -26,7 +28,8 @@ public class ProfileView extends AbstractView {
     private String labelProperty;
     private LogoutLink logoutLink;
 
-    public ProfileView() {
+    public ProfileView(@Autowired AdminService adminService) {
+        super(adminService);
         logoutLink = new LogoutLink();
         labelProperty = "";
         addComponent(new Label(labelProperty, ContentMode.HTML));
