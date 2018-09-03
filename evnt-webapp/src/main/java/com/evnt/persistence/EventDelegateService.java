@@ -47,14 +47,14 @@ public class EventDelegateService{
         return response.getBody();
     }
 
-    public EventObject findByUserFk(int userFk){
+    public List<EventObject> findByUserFk(int userFk){
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<EventObject> response =
+        ResponseEntity<List<EventObject>> response =
                 restTemplate.exchange(
                         URL+"userFk/"+userFk,
                         HttpMethod.GET,
                         null,
-                        new ParameterizedTypeReference<EventObject>(){});
+                        new ParameterizedTypeReference<List<EventObject>>(){});
         return response.getBody();
     }
 

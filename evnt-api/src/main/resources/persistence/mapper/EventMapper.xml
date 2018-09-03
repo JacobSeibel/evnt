@@ -19,6 +19,9 @@
 
     <resultMap id="eventUserResultMap" type="evntapi.domain.EventUser">
         <result property="eventFk"      column="eurr_event_fk"/>
+        <result property="userFk"       column="eurr_user_fk"/>
+        <result property="roleFk"       column="eurr_role_fk"/>
+        <result property="responseFk"   column="eurr_response_fk"/>
         <result property="responseDate" column="eurr_response_date"/>
 
         <association property="user" resultMap="evntapi.rest.mapper.UserMapper.userResultMap"/>
@@ -38,6 +41,9 @@
         event.is_active as event_is_active,
 
         eurr.event_fk as eurr_event_fk,
+        eurr.user_fk as eurr_user_fk,
+        eurr.role_fk as eurr_role_fk,
+        eurr.response_fk as eurr_response_fk,
         eurr.response_date as eurr_response_date,
 
         <include refid="evntapi.rest.mapper.UserMapper.userSelectCols"/>,
@@ -78,6 +84,8 @@
             <include refid="eventTables"/>
         where
             eurr.user_fk = #{userFk}
+        and
+            event.is_active = 1
     </select>
 
     <insert id="insert" parameterType="evntapi.domain.Event" useGeneratedKeys="true" keyProperty="pk" keyColumn="PK">

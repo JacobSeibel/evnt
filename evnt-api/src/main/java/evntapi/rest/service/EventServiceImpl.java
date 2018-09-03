@@ -26,7 +26,7 @@ public class EventServiceImpl implements EventService{
     }
 
     @Override
-    public Event findByUserFk(int userFk) {
+    public List<Event> findByUserFk(int userFk) {
         return mapper.findByUserFk(userFk);
     }
 

@@ -32,10 +32,11 @@ public abstract class AbstractView extends Panel implements View {
     }
 
     private void buildNavbar(){
-        Panel navbarPanel = new Panel();
-
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setSpacing(true);
+        final Link homeLink = new Link("Home", new ExternalResource("#!" + MainView.NAME));
+        homeLink.setIcon(VaadinIcons.HOME);
+        horizontalLayout.addComponent(homeLink);
         final Link profileLink = new Link("Your Profile", new ExternalResource("#!" + ProfileView.NAME));
         profileLink.setIcon(VaadinIcons.USER);
         horizontalLayout.addComponent(profileLink);
@@ -47,13 +48,14 @@ public abstract class AbstractView extends Panel implements View {
         logoutLink.updateVisibility();
         horizontalLayout.addComponent(logoutLink);
 
-        Link adminLink = new Link("Admin page", new ExternalResource("#!" + AdminView.NAME));
-        adminLink.setIcon(VaadinIcons.LOCK);
-        horizontalLayout.addComponent(adminLink);
+//        Link adminLink = new Link("Admin page", new ExternalResource("#!" + AdminView.NAME));
+//        adminLink.setIcon(VaadinIcons.LOCK);
+//        horizontalLayout.addComponent(adminLink);
 
-        Link aboutLink = new Link("About", new ExternalResource("#!" + AboutView.NAME));
-        aboutLink.setIcon(VaadinIcons.QUESTION_CIRCLE);
-        horizontalLayout.addComponent(aboutLink);
+//        Link aboutLink = new Link("About", new ExternalResource("#!" + AboutView.NAME));
+//        aboutLink.setIcon(VaadinIcons.QUESTION_CIRCLE);
+//        horizontalLayout.addComponent(aboutLink);
+
         addComponent(horizontalLayout);
     }
 

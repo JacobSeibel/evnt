@@ -10,6 +10,6 @@ import java.util.List;
 public interface EventService {
     List<Event> findAll();
     Event findByPk(int pk);
-    Event findByUserFk(int userFk);
+    List<Event> findByUserFk(int userFk);
     void insert(Event event, int creatorFk);
 }

@@ -31,7 +31,7 @@ public class EventController {
 
     @GetMapping("/userFk/{userFk}")
     @ResponseStatus(HttpStatus.OK)
-    public Event findByUserFk(@PathVariable("userFk") int userFk){
+    public List<Event> findByUserFk(@PathVariable("userFk") int userFk){
         return eventService.findByUserFk(userFk);
     }
 

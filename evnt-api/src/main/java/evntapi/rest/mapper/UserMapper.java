@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface UserMapper {
     List<User> findAll();
+    List<User> findActive();
     User findByUsername(String username);
     User findByEmail(String email);
     void insert(User user);

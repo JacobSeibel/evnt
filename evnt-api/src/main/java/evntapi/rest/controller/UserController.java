@@ -22,6 +22,12 @@ public class UserController {
         return userService.findAll();
     }
 
+    @GetMapping("/active")
+    @ResponseStatus(HttpStatus.OK)
+    public List<User> findActive(){
+        return userService.findAll();
+    }
+
     @GetMapping("/username/{username}")
     @ResponseStatus(HttpStatus.OK)
     public User findByUsername(@PathVariable("username") String username){

@@ -21,6 +21,7 @@ public class Event {
     //TODO: Figure this out
     private String eventPhoto;
     private boolean isActive;
+    private User creator;
 
     private List<EventUser> eventUsers;
 }

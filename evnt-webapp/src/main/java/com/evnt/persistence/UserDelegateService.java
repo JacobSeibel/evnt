@@ -31,6 +31,17 @@ public class UserDelegateService implements UserDetailsService{
         return response.getBody();
     }
 
+    public List<User> findActive(){
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<List<User>> response =
+                restTemplate.exchange(
+                        URL+"active",
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<List<User>>(){});
+        return response.getBody();
+    }
+
     public User findByUsername(String username){
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<User> response =

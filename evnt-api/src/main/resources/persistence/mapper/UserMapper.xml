@@ -42,6 +42,15 @@
             <include refid="userTables"/>
     </select>
 
+    <select id="findActive" resultMap="userResultMap">
+        select
+            <include refid="userSelectCols"/>
+        from
+            <include refid="userTables"/>
+        where
+            user.is_active = 1
+    </select>
+
     <select id="findByUsername" resultMap="userResultMap">
         select
             <include refid="userSelectCols"/>
@@ -49,6 +58,8 @@
             <include refid="userTables"/>
         where
             user.username = #{username}
+        and
+            user.is_active = 1
     </select>
 
     <select id="findByEmail" resultMap="userResultMap">
@@ -58,6 +69,8 @@
             <include refid="userTables"/>
         where
             lower(user.email) = lower(#{email})
+        and
+            user.is_active = 1
     </select>
 
     <insert id="insert" parameterType="evntapi.domain.User" useGeneratedKeys="true" keyProperty="pk" keyColumn="PK">

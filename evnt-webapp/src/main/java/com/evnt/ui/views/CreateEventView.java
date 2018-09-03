@@ -98,7 +98,7 @@ public class CreateEventView extends AbstractView implements View {
         Notification success = new Notification("Successfully created event!");
         success.setDelayMsec(3000);
         success.show(Page.getCurrent());
-        EvntWebappUI.getUiService().postNavigationEvent(this, "#!"+MainView.NAME);
+        EvntWebappUI.getUiService().postNavigationEvent(this, MainView.NAME);
     }
 
     @Override
