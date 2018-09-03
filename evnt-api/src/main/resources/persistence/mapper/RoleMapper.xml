@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="evntapi.rest.mapper.RoleMapper">
+    <resultMap id="roleResultMap" type="evntapi.domain.Role">
+        <id     property="pk"          column="role_pk"/>
+        <result property="name"        column="role_name"/>
+        <result property="description" column="role_description"/>
+        <result property="isActive"    column="role_is_active"/>
+    </resultMap>
+
+    <sql id="roleSelectCols">
+        role.pk as role_pk,
+        role.name as role_name,
+        role.description as role_description,
+        role.is_active as role_is_active
+    </sql>
+
+    <sql id="roleTables">
+        role
+    </sql>
+
+    <select id="findAll" resultMap="roleResultMap">
+        select
+            <include refid="roleSelectCols"/>
+        from
+            <include refid="roleTables"/>
+    </select>
+
+    <select id="findByPk" resultMap="roleResultMap">
+        select
+            <include refid="roleSelectCols"/>
+        from
+            <include refid="roleTables"/>
+        where
+            role.pk = #{pk}
+    </select>
+</mapper>

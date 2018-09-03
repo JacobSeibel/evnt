@@ -1,14 +1,18 @@
 package com.evnt.domain;
 
+import com.vaadin.server.VaadinSession;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.io.File;
+import java.time.*;
+import java.time.temporal.TemporalUnit;
 import java.util.Date;
+import java.util.Locale;
 
 @Getter @Setter @ToString
-public class Event {
+public class EventObject {
     private Integer pk;
     private String name;
     private String location;

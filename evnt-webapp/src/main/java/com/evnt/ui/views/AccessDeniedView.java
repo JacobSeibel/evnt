@@ -1,6 +1,5 @@
 package com.evnt.ui.views;
 
-import com.evnt.persistence.AdminService;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ExternalResource;
@@ -15,8 +14,7 @@ public class AccessDeniedView extends AbstractView  {
 
     public static final String NAME = "accessDenied";
 
-    public AccessDeniedView(@Autowired AdminService adminService) {
-        super(adminService);
+    public AccessDeniedView() {
         addComponent(new Label("<h1>Access Denied!</h1>", ContentMode.HTML));
         addComponent(new Label("You don't have required permission to access this resource."));
         Link homeLink = new Link("Home", new ExternalResource("#"));

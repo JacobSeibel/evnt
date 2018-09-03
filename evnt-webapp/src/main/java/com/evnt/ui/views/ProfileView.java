@@ -1,6 +1,5 @@
 package com.evnt.ui.views;
 
-import com.evnt.persistence.AdminService;
 import com.evnt.ui.EvntWebappUI;
 import com.evnt.ui.components.GoToMainViewLink;
 import com.evnt.ui.components.LogoutLink;
@@ -28,8 +27,7 @@ public class ProfileView extends AbstractView {
     private String labelProperty;
     private LogoutLink logoutLink;
 
-    public ProfileView(@Autowired AdminService adminService) {
-        super(adminService);
+    public ProfileView() {
         logoutLink = new LogoutLink();
         labelProperty = "";
         addComponent(new Label(labelProperty, ContentMode.HTML));
@@ -38,7 +36,6 @@ public class ProfileView extends AbstractView {
         addComponent(logoutLink);
         logoutLink.updateVisibility();
 
-        registerWithEventbus();
     }
 
     @PostConstruct

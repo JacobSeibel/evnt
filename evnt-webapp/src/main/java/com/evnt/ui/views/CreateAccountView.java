@@ -2,23 +2,18 @@ package com.evnt.ui.views;
 
 import com.evnt.domain.SecurityRole;
 import com.evnt.domain.User;
-import com.evnt.persistence.AdminService;
 import com.evnt.persistence.SecurityRoleDelegateService;
 import com.evnt.persistence.UserDelegateService;
 import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
-import com.evnt.ui.components.GoToMainViewLink;
 import com.evnt.ui.events.NavigationEvent;
 import com.google.common.eventbus.EventBus;
 import com.vaadin.data.Binder;
 import com.vaadin.data.validator.EmailValidator;
-import com.vaadin.event.ShortcutAction;
-import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.ExternalResource;
+import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Button.ClickEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,8 +32,7 @@ public class CreateAccountView extends AbstractView {
 
     private String forwardTo;
 
-    public CreateAccountView(@Autowired AdminService adminService) {
-        super(adminService);
+    public CreateAccountView() {
         Binder<User> binder = new Binder<>();
 
         TextField usernameField = new TextField("Username");
@@ -93,11 +87,11 @@ public class CreateAccountView extends AbstractView {
     }
 
     private void createAccount(User user, String unencryptedPassword){
-        user.addSecurityRole(SecurityRole.ROLE_USER, securityService);
+        user.addSecurityRole(SecurityRole.ROLE_USER_PK, securityService);
         userService.insert(user);
         Notification success = new Notification("Successfully created user "+user.getUsername());
         success.setDelayMsec(3000);
-        success.show(EvntWebappUI.getCurrent().getPage());
+        success.show(Page.getCurrent());
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), unencryptedPassword);
         if (userAuthenticationService.loginUser(authentication)) {

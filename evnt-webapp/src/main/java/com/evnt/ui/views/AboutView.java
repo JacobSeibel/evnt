@@ -1,6 +1,5 @@
 package com.evnt.ui.views;
 
-import com.evnt.persistence.AdminService;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
@@ -12,8 +11,7 @@ public class AboutView extends AbstractView {
 
     public static final String NAME = "about";
 
-    public AboutView(@Autowired AdminService adminService) {
-        super(adminService);
+    public AboutView() {
         addComponent(new Label("<h1>About</h1>", ContentMode.HTML));
     }
 

@@ -1,11 +1,9 @@
 package com.evnt.ui.views;
 
-import com.evnt.persistence.AdminService;
 import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
 import com.evnt.ui.components.GoToMainViewLink;
 import com.evnt.ui.events.NavigationEvent;
-import com.evnt.util.BCrypt;
 import com.google.common.eventbus.EventBus;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.icons.VaadinIcons;
@@ -13,12 +11,9 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Button.ClickEvent;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringView(name = LoginView.NAME)
 public class LoginView extends AbstractView {
@@ -32,8 +27,7 @@ public class LoginView extends AbstractView {
     private TextField nameTF;
     private PasswordField passwordTF;
 
-    public LoginView(@Autowired AdminService adminService) {
-        super(adminService);
+    public LoginView() {
         addComponent(new Label(
                 "Please enter your credentials:"));
         nameTF = new TextField();

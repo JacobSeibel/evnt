@@ -6,6 +6,7 @@ import lombok.ToString;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 @Getter @Setter @ToString
 public class Event {
@@ -18,6 +19,8 @@ public class Event {
     private boolean allowMaybes;
     private Date rsvpDate;
     //TODO: Figure this out
-    private File eventPhoto;
+    private String eventPhoto;
     private boolean isActive;
+
+    private List<EventUser> eventUsers;
 }

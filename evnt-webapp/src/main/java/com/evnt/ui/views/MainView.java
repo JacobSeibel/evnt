@@ -1,76 +1,52 @@
 package com.evnt.ui.views;
 
+import com.evnt.domain.EventObject;
+import com.evnt.domain.SecurityRole;
 import com.evnt.domain.User;
-import com.evnt.persistence.AdminService;
+import com.evnt.persistence.EventDelegateService;
 import com.evnt.persistence.UserDelegateService;
+import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
-import com.evnt.ui.components.LogoutLink;
 import com.evnt.ui.events.LogoutEvent;
 import com.evnt.ui.events.UserLoggedInEvent;
-import com.google.common.eventbus.Subscribe;
-import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.ExternalResource;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Link;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.PostConstruct;
+
+@Secured(SecurityRole.ROLE_USER)
 @SpringView(name = MainView.NAME)
 public class MainView extends AbstractView {
 
-    private UserDelegateService userService;
+    @Autowired
+    private UserAuthenticationService userAuthService;
+    @Autowired
+    private EventDelegateService eventService;
 
     public final static String NAME = "main";
 
-    private String welcomeLabelText;
+    @PostConstruct
+    void init() {
+        if(userAuthService.loggedInUser() != null) {
+            Label welcomeLabel = new Label("Welcome back, " + userAuthService.loggedInUser().getDisplayName() + "!");
 
-    public MainView(
-            @Autowired AdminService adminService,
-            @Autowired UserDelegateService userService
-    ) {
-        super(adminService);
+            Grid<EventObject> eventsGrid = new Grid<>();
+            eventsGrid.setItems(eventService.findByUserFk(userAuthService.loggedInUser().getPk()));
+            eventsGrid.addColumn(EventObject::getName).setCaption("Name");
 
-        this.userService = userService;
-
-        welcomeLabelText = "";
-
-        updateWelcomeMessage();
-        Label welcomeLabel = new Label(welcomeLabelText, ContentMode.HTML);
-
-        addComponent(welcomeLabel);
-
-        registerWithEventbus();
-    }
-
-    private void updateWelcomeMessage() {
-        String username = null;
-        if (!EvntWebappUI.getCurrent().isUserAnonymous()) {
-            final User principal = userService.findByUsername((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-            username = principal.getFullName();
+            addComponent(welcomeLabel);
+            addComponent(eventsGrid);
         }
-
-        welcomeLabelText = username == null ? "<h1>Welcome Stranger</h1><hr/>You're currently not logged in.<hr/>"
-                        : "<h1>Welcome " + username + "!</h1><hr/>";
     }
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-    }
-
-    @Override
-    public void userLoggedIn(UserLoggedInEvent event) {
-        super.userLoggedIn(event);
-        updateWelcomeMessage();
-    }
-
-    @Override
-    public void userLoggedOut(LogoutEvent event) {
-        super.userLoggedOut(event);
-        updateWelcomeMessage();
+        // This view is constructed in the init() method()
     }
 }

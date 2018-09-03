@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="evntapi.rest.mapper.ResponseMapper">
+    <resultMap id="responseResultMap" type="evntapi.domain.Response">
+        <id     property="pk"          column="response_pk"/>
+        <result property="name"        column="response_name"/>
+        <result property="description" column="response_description"/>
+        <result property="isActive"    column="response_is_active"/>
+    </resultMap>
+
+    <sql id="responseSelectCols">
+        response.pk as response_pk,
+        response.name as response_name,
+        response.description as response_description,
+        response.is_active as response_is_active
+    </sql>
+
+    <sql id="responseTables">
+        response
+    </sql>
+
+    <select id="findAll" resultMap="responseResultMap">
+        select
+        <include refid="responseSelectCols"/>
+        from
+        <include refid="responseTables"/>
+    </select>
+
+    <select id="findByPk" resultMap="responseResultMap">
+        select
+        <include refid="responseSelectCols"/>
+        from
+        <include refid="responseTables"/>
+        where
+        response.pk = #{pk}
+    </select>
+</mapper>

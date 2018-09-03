@@ -1,6 +1,5 @@
 package com.evnt.ui.views;
 
-import com.evnt.persistence.AdminService;
 import com.evnt.ui.components.GoToMainViewLink;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.ContentMode;
@@ -15,8 +14,7 @@ public class ErrorView extends AbstractView {
 
     private String errorMessage;
 
-    public ErrorView(@Autowired AdminService adminService) {
-        super(adminService);
+    public ErrorView() {
         Label errorMessageLabel = new Label(errorMessage, ContentMode.HTML);
         addComponent(errorMessageLabel);
         addComponent(new GoToMainViewLink());

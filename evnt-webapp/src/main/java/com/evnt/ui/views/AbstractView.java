@@ -1,6 +1,5 @@
 package com.evnt.ui.views;
 
-import com.evnt.persistence.AdminService;
 import com.evnt.ui.EvntWebappUI;
 import com.evnt.ui.components.LogoutLink;
 import com.evnt.ui.events.LogoutEvent;
@@ -11,7 +10,6 @@ import com.vaadin.navigator.View;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PreDestroy;
 
@@ -20,11 +18,7 @@ public abstract class AbstractView extends Panel implements View {
     private VerticalLayout layout;
     private LogoutLink logoutLink;
 
-    protected AdminService adminService;
-
-    AbstractView(AdminService adminService) {
-        this.adminService = adminService;
-
+    AbstractView() {
         setSizeFull();
         layout = new VerticalLayout();
         layout.setMargin(true);
@@ -33,6 +27,8 @@ public abstract class AbstractView extends Panel implements View {
         buildNavbar();
 
         setContent(layout);
+
+        registerWithEventbus();
     }
 
     private void buildNavbar(){
@@ -43,8 +39,8 @@ public abstract class AbstractView extends Panel implements View {
         final Link profileLink = new Link("Your Profile", new ExternalResource("#!" + ProfileView.NAME));
         profileLink.setIcon(VaadinIcons.USER);
         horizontalLayout.addComponent(profileLink);
-        final Link invalidLink = new Link("Go to some invalid page", new ExternalResource("#!invalid_page"));
-        invalidLink.setIcon(VaadinIcons.BOMB);
+        final Link invalidLink = new Link("Create Event", new ExternalResource("#!" + CreateEventView.NAME));
+        invalidLink.setIcon(VaadinIcons.CALENDAR);
         horizontalLayout.addComponent(invalidLink);
 
         logoutLink = new LogoutLink();
@@ -59,10 +55,6 @@ public abstract class AbstractView extends Panel implements View {
         aboutLink.setIcon(VaadinIcons.QUESTION_CIRCLE);
         horizontalLayout.addComponent(aboutLink);
         addComponent(horizontalLayout);
-
-        Button adminButton = new Button("Admin Button");
-        adminButton.addClickListener((Button.ClickListener) event -> adminService.doSomeAdministrationTask());
-        addComponent(adminButton);
     }
 
     public void addComponent(Component c) {

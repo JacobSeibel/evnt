@@ -1,5 +1,7 @@
 package com.evnt.spring.security;
 
+import com.evnt.domain.User;
+import com.evnt.persistence.UserDelegateService;
 import com.vaadin.ui.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +15,10 @@ public class UserAuthenticationService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    UserDelegateService userService;
+
+    private User loggedInUser;
 
     public boolean loginUser(Authentication authenticationRequest) {
         try {
@@ -28,5 +34,16 @@ public class UserAuthenticationService {
             Notification.show("Authentication error", "Could not authenticate", Notification.Type.ERROR_MESSAGE);
             return false;
         }
+    }
+
+    public User loggedInUser(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth.isAuthenticated()) {
+            if(loggedInUser == null || !loggedInUser.getUsername().equals(auth.getPrincipal())) {
+                loggedInUser = userService.findByUsername((String) auth.getPrincipal());
+            }
+            return loggedInUser;
+        }
+        return null;
     }
 }

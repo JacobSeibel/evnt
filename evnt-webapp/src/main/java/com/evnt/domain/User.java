@@ -83,4 +83,11 @@ public class User implements UserDetails {
         if(securityRoles == null) securityRoles = new ArrayList<>();
         securityRoles.add(role);
     }
+
+    public String getDisplayName(){
+        if(firstName != null && lastName != null) return getFullName();
+        if(firstName != null) return firstName;
+        if(lastName != null) return lastName;
+        return username;
+    }
 }
