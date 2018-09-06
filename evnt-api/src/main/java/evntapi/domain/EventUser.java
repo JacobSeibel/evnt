@@ -13,7 +13,7 @@ public class EventUser {
     private int eventFk;
     private int userFk;
     private int roleFk;
-    private int responseFk;
+    private Integer responseFk;
 
     private User user;
     private Role role;

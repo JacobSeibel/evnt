@@ -69,4 +69,13 @@ public class EventDelegateService{
                 request,
                 new ParameterizedTypeReference<EventObject>(){});
     }
+
+    public void invite(int eventFk, int userFk){
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.exchange(
+                URL + "invite/" + eventFk + "/" + userFk,
+                HttpMethod.POST,
+                null,
+                new ParameterizedTypeReference<EventObject>(){});
+    }
 }

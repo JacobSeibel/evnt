@@ -42,4 +42,14 @@ public class EventServiceImpl implements EventService{
         creator.setResponseDate(new Date());
         mapper.insertEventUser(creator);
     }
+
+    @Override
+    @Transactional
+    public void invite(int eventFk, int userFk) {
+        EventUser creator = new EventUser();
+        creator.setEventFk(eventFk);
+        creator.setUserFk(userFk);
+        creator.setRoleFk(Role.GUEST);
+        mapper.insertEventUser(creator);
+    }
 }

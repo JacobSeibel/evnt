@@ -44,9 +44,8 @@ public class MainView extends AbstractView {
             Grid<EventObject> eventsGrid = new Grid<>();
             List<EventObject> events = eventService.findByUserFk(userAuthService.loggedInUser().getPk());
             eventsGrid.setItems(events);
-            Grid.Column nameColumn = eventsGrid.addColumn(EventObject::getName, new ButtonRenderer<>(click -> {
-                EvntWebappUI.getUiService().postNavigationEvent(this, ViewEventView.NAME+"/?eventPk="+click.getItem().getPk());
-            })).setCaption("Name");
+            Grid.Column nameColumn = eventsGrid.addColumn(EventObject::getName, new ButtonRenderer<>(click ->
+                    EvntWebappUI.getUiService().postNavigationEvent(this, ViewEventView.NAME+"/?eventPk="+click.getItem().getPk()))).setCaption("Name");
             Grid.Column creatorColumn = eventsGrid.addColumn(event -> event.getCreator().getDisplayName()).setCaption("Created By");
             Grid.Column startDateColumn = eventsGrid.addColumn(EventObject::getStartDate).setCaption("Start Date");
 

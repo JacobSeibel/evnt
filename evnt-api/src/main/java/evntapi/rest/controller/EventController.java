@@ -40,4 +40,10 @@ public class EventController {
     public void insert(@PathVariable("creatorFk") int creatorFk, @RequestBody Event event){
         eventService.insert(event, creatorFk);
     }
+
+    @PostMapping("/invite/{eventFk}/{userFk}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void invite(@PathVariable("eventFk") int eventFk, @PathVariable("userFk") int userFk){
+        eventService.invite(eventFk, userFk);
+    }
 }

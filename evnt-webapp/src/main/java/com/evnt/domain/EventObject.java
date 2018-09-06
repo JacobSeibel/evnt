@@ -50,4 +50,11 @@ public class EventObject {
         }
         return hosts;
     }
+
+    public EventUser findUserOnEvent(int userPk){
+        for(EventUser eventUser : eventUsers){
+            if(eventUser.getUserFk() == userPk) return eventUser;
+        }
+        return null;
+    }
 }
