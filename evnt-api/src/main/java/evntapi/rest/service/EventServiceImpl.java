@@ -26,6 +26,11 @@ public class EventServiceImpl implements EventService{
     }
 
     @Override
+    public List<EventUser> findEventUsersByPk(int pk) {
+        return mapper.findEventUsersByPk(pk);
+    }
+
+    @Override
     public List<Event> findByUserFk(int userFk) {
         return mapper.findByUserFk(userFk);
     }
@@ -44,12 +49,16 @@ public class EventServiceImpl implements EventService{
     }
 
     @Override
-    @Transactional
     public void invite(int eventFk, int userFk) {
         EventUser creator = new EventUser();
         creator.setEventFk(eventFk);
         creator.setUserFk(userFk);
         creator.setRoleFk(Role.GUEST);
         mapper.insertEventUser(creator);
+    }
+
+    @Override
+    public void uninvite(int eventFk, int userFk) {
+        mapper.deleteEventUser(eventFk, userFk);
     }
 }

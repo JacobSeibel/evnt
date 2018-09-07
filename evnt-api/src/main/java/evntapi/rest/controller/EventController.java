@@ -1,6 +1,7 @@
 package evntapi.rest.controller;
 
 import evntapi.domain.Event;
+import evntapi.domain.EventUser;
 import evntapi.domain.SecurityRole;
 import evntapi.rest.RestConstants;
 import evntapi.rest.service.EventService;
@@ -29,6 +30,12 @@ public class EventController {
         return eventService.findByPk(pk);
     }
 
+    @GetMapping("/{pk}/eventUser")
+    @ResponseStatus(HttpStatus.OK)
+    public List<EventUser> findEventUsersByPk(@PathVariable("pk") int pk){
+        return eventService.findEventUsersByPk(pk);
+    }
+
     @GetMapping("/userFk/{userFk}")
     @ResponseStatus(HttpStatus.OK)
     public List<Event> findByUserFk(@PathVariable("userFk") int userFk){
@@ -45,5 +52,11 @@ public class EventController {
     @ResponseStatus(HttpStatus.CREATED)
     public void invite(@PathVariable("eventFk") int eventFk, @PathVariable("userFk") int userFk){
         eventService.invite(eventFk, userFk);
+    }
+
+    @DeleteMapping("/uninvite/{eventFk}/{userFk}")
+    @ResponseStatus(HttpStatus.OK)
+    public void uninvite(@PathVariable("eventFk") int eventFk, @PathVariable("userFk") int userFk){
+        eventService.uninvite(eventFk, userFk);
     }
 }

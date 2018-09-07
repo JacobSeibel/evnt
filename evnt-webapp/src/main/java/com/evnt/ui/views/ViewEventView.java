@@ -73,6 +73,8 @@ public class ViewEventView extends AbstractView {
         EvntWebappUI.getCurrent().addWindow(new ManageInvitesOverlay(event, userService, eventService));
     }
 
+
+
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
         Integer eventPk = ParamUtils.getIntegerParam("eventPk");

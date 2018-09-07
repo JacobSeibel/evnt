@@ -1,6 +1,7 @@
 package com.evnt.persistence;
 
 import com.evnt.domain.EventObject;
+import com.evnt.domain.EventUser;
 import com.evnt.domain.User;
 import com.evnt.spring.security.UserAuthenticationService;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,17 @@ public class EventDelegateService{
         return response.getBody();
     }
 
+    public List<EventUser> findEventUsersByPk(int pk){
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<List<EventUser>> response =
+                restTemplate.exchange(
+                        URL + pk + "/eventUser",
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<List<EventUser>>() {});
+        return response.getBody();
+    }
+
     public List<EventObject> findByUserFk(int userFk){
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<List<EventObject>> response =
@@ -75,6 +87,15 @@ public class EventDelegateService{
         restTemplate.exchange(
                 URL + "invite/" + eventFk + "/" + userFk,
                 HttpMethod.POST,
+                null,
+                new ParameterizedTypeReference<EventObject>(){});
+    }
+
+    public void uninvite(int eventFk, int userFk){
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.exchange(
+                URL + "uninvite/" + eventFk + "/" + userFk,
+                HttpMethod.DELETE,
                 null,
                 new ParameterizedTypeReference<EventObject>(){});
     }
