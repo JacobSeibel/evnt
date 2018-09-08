@@ -14,19 +14,7 @@
         <result property="rsvpDate"    column="event_rsvp_date"/>
         <result property="isActive"    column="event_is_active"/>
 
-        <collection property="eventUsers" resultMap="eventUserResultMap"/>
-    </resultMap>
-
-    <resultMap id="eventUserResultMap" type="evntapi.domain.EventUser">
-        <result property="eventFk"      column="eurr_event_fk"/>
-        <result property="userFk"       column="eurr_user_fk"/>
-        <result property="roleFk"       column="eurr_role_fk"/>
-        <result property="responseFk"   column="eurr_response_fk"/>
-        <result property="responseDate" column="eurr_response_date"/>
-
-        <association property="user" resultMap="evntapi.rest.mapper.UserMapper.userResultMap"/>
-        <association property="role" resultMap="evntapi.rest.mapper.RoleMapper.roleResultMap"/>
-        <association property="response" resultMap="evntapi.rest.mapper.ResponseMapper.responseResultMap"/>
+        <collection property="eventUsers" resultMap="evntapi.rest.mapper.EventUserMapper.eventUserResultMap"/>
     </resultMap>
 
     <sql id="eventSelectCols">
@@ -40,32 +28,15 @@
         event.rsvp_date as event_rsvp_date,
         event.is_active as event_is_active,
 
-        <include refid="evntapi.rest.mapper.EventMapper.eventUserSelectCols"/>,
+        <include refid="evntapi.rest.mapper.EventUserMapper.eventUserSelectCols"/>,
         <include refid="evntapi.rest.mapper.UserMapper.userSelectCols"/>,
         <include refid="evntapi.rest.mapper.RoleMapper.roleSelectCols"/>,
         <include refid="evntapi.rest.mapper.ResponseMapper.responseSelectCols"/>
     </sql>
 
-    <sql id="eventUserSelectCols">
-        eurr.event_fk as eurr_event_fk,
-        eurr.user_fk as eurr_user_fk,
-        eurr.role_fk as eurr_role_fk,
-        eurr.response_fk as eurr_response_fk,
-        eurr.response_date as eurr_response_date
-    </sql>
-
     <sql id="eventTables">
         event
         left join event_user_role_response eurr on (event.pk = eurr.event_fk)
-        left join user on (eurr.user_fk = user.pk)
-        left join role on (eurr.role_fk = role.pk)
-        left join response on (eurr.response_fk = response.pk)
-        left join user_security_role usr on (usr.user_fk = user.pk)
-        left join security_role securityRole on (securityRole.pk = usr.security_role_fk)
-    </sql>
-
-    <sql id="eventUserTables">
-        event_user_role_response eurr
         left join user on (eurr.user_fk = user.pk)
         left join role on (eurr.role_fk = role.pk)
         left join response on (eurr.response_fk = response.pk)
@@ -89,22 +60,13 @@
             event.pk = #{pk}
     </select>
 
-    <select id="findEventUsersByPk" resultMap="eventUserResultMap">
-        select
-            <include refid="eventUserSelectCols"/>
-        from
-            <include refid="eventUserTables"/>
-        where
-            eurr.event_fk = #{pk}
-    </select>
-
     <select id="findByUserFk" resultMap="eventResultMap">
         select
             <include refid="eventSelectCols"/>
         from
             <include refid="eventTables"/>
         where
-            eurr.user_fk = #{userFk}
+            #{userFk} in (select eventUser.user_fk from event_user_role_response eventUser where eventUser.event_fk = event.pk)
         and
             event.is_active = 1
     </select>
@@ -124,24 +86,4 @@
             #{eventPhoto},
             #{isActive})
     </insert>
-
-    <insert id="insertEventUser" parameterType="evntapi.domain.EventUser">
-        insert into
-            event_user_role_response(event_fk, user_fk, role_fk, response_fk, response_date)
-        values
-        (#{eventFk},
-        #{userFk},
-        #{roleFk},
-        #{responseFk},
-        #{responseDate})
-    </insert>
-
-    <delete id="deleteEventUser">
-        delete from
-            event_user_role_response
-        where
-            event_fk = #{eventFk}
-        and
-            user_fk = #{userFk}
-    </delete>
 </mapper>

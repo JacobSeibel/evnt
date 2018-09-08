@@ -1,5 +1,6 @@
 package com.evnt.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -19,4 +20,10 @@ public class EventUser {
     private Role role;
     private Response response;
     private Date responseDate;
+
+    public void changeResponse(Response response){
+        this.response = response;
+        this.responseFk = response.getPk();
+        this.responseDate = new Date();
+    }
 }

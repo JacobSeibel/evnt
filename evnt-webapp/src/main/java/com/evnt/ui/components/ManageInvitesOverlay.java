@@ -2,39 +2,38 @@ package com.evnt.ui.components;
 
 import com.evnt.domain.EventObject;
 import com.evnt.domain.EventUser;
+import com.evnt.domain.Role;
 import com.evnt.domain.User;
 import com.evnt.persistence.EventDelegateService;
+import com.evnt.persistence.EventUserDelegateService;
 import com.evnt.persistence.UserDelegateService;
 import com.evnt.ui.EvntWebappUI;
 import com.evnt.ui.views.ViewEventView;
 import com.vaadin.icons.VaadinIcons;
-import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.ContentMode;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 
-import java.util.List;
 
 public class ManageInvitesOverlay extends Window {
 
     private final UserDelegateService userService;
     private final EventDelegateService eventService;
+    private final EventUserDelegateService eventUserService;
 
     private final EventObject event;
     private Grid<User> usersToInviteGrid;
 
-    public ManageInvitesOverlay(EventObject event, UserDelegateService userService, EventDelegateService eventService){
+    public ManageInvitesOverlay(EventObject event, UserDelegateService userService, EventDelegateService eventService, EventUserDelegateService eventUserService){
         this.event = event;
         this.userService = userService;
         this.eventService = eventService;
+        this.eventUserService = eventUserService;
         build();
         center();
         setClosable(true);
         setModal(true);
         setHeight("60%");
         setWidth("40%");
-
-        this.addCloseListener(close -> EvntWebappUI.getUiService().postNavigationEvent(this, ViewEventView.NAME+"/?eventPk="+event.getPk()));
     }
 
     private void build(){
@@ -50,6 +49,7 @@ public class ManageInvitesOverlay extends Window {
         Grid<User> usersToInviteGrid = new Grid<>();
         usersToInviteGrid.setItems(userService.findActive());
 
+        //TODO: Make sure invited users sort first, then uninvited users last
         usersToInviteGrid.addColumn(User::getDisplayName).setCaption("Name");
         usersToInviteGrid.addColumn(User::getUsername).setCaption("Username");
         usersToInviteGrid.addColumn(User::getEmail).setCaption("Email");
@@ -63,15 +63,17 @@ public class ManageInvitesOverlay extends Window {
         EventUser eventUser = event.findUserOnEvent(user.getPk());
         if(eventUser != null) {
             HorizontalLayout invitedLayout = new HorizontalLayout();
-            Label invitedLabel = new Label(eventUser.getResponse() != null ? eventUser.getResponse().getName() : "Invited");
-            Button uninviteBtn = new Button();
-            uninviteBtn.setIcon(VaadinIcons.CLOSE);
-            uninviteBtn.addClickListener(click -> {
-                uninvite(user);
-                uninviteBtn.setVisible(false);
-            });
-
-            invitedLayout.addComponents(invitedLabel, uninviteBtn);
+            String invitedString = eventUser.getResponse() != null ? eventUser.getResponse().getName() : "Invited";
+            if(eventUser.getRoleFk() != Role.GUEST) invitedString += " ("+eventUser.getRole().getName()+")";
+            Label invitedLabel = new Label(invitedString);
+            invitedLabel.setWidth("10em");
+            invitedLayout.addComponent(invitedLabel);
+            if(eventUser.getRoleFk() != Role.CREATOR) {
+                Button uninviteBtn = new Button();
+                uninviteBtn.setIcon(VaadinIcons.CLOSE);
+                uninviteBtn.addClickListener(click -> uninvite(user, uninviteBtn));
+                invitedLayout.addComponent(uninviteBtn);
+            }
 
             return invitedLayout;
         }else {
@@ -84,25 +86,21 @@ public class ManageInvitesOverlay extends Window {
     }
 
     private void invite(User user){
-        eventService.invite(event.getPk(), user.getPk());
-        refreshGrid();
+        EventUser eventUser = eventUserService.insert(event.getPk(), user.getPk());
+        event.getEventUsers().add(eventUser);
+        usersToInviteGrid.getDataProvider().refreshItem(user);
     }
 
-    private void uninvite(User user){
+    private void uninvite(User user, Button uninviteBtn){
         EvntWebappUI.getCurrent().addWindow(
                 new ConfirmDialog(
                         "Are you sure you want to remove "+user.getDisplayName()+" from the event?",
                         click -> {
-                            eventService.uninvite(event.getPk(), user.getPk());
-                            refreshGrid();
+                            eventUserService.delete(event.getPk(), user.getPk());
+                            event.getEventUsers().remove(event.findUserOnEvent(user.getPk()));
+                            usersToInviteGrid.getDataProvider().refreshItem(user);
+                            uninviteBtn.setVisible(false);
                         },
                         click -> {}));
     }
-
-    private void refreshGrid(){
-        event.setEventUsers(eventService.findEventUsersByPk(event.getPk()));
-        usersToInviteGrid.getDataProvider().refreshAll();
-    }
-
-
 }

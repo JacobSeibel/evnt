@@ -2,6 +2,7 @@ package com.evnt.persistence;
 
 import com.evnt.domain.EventObject;
 import com.evnt.domain.EventUser;
+import com.evnt.domain.Response;
 import com.evnt.domain.User;
 import com.evnt.spring.security.UserAuthenticationService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,9 @@ public class EventDelegateService{
     @Autowired
     UserAuthenticationService userAuthenticationService;
 
+    /*
+    ##### GET #####
+     */
     public List<EventObject> findAll(){
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<List<EventObject>> response =
@@ -48,17 +52,6 @@ public class EventDelegateService{
         return response.getBody();
     }
 
-    public List<EventUser> findEventUsersByPk(int pk){
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<List<EventUser>> response =
-                restTemplate.exchange(
-                        URL + pk + "/eventUser",
-                        HttpMethod.GET,
-                        null,
-                        new ParameterizedTypeReference<List<EventUser>>() {});
-        return response.getBody();
-    }
-
     public List<EventObject> findByUserFk(int userFk){
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<List<EventObject>> response =
@@ -70,6 +63,9 @@ public class EventDelegateService{
         return response.getBody();
     }
 
+    /*
+    ##### POST #####
+     */
     public void insert(EventObject event){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -79,24 +75,6 @@ public class EventDelegateService{
                 URL+userAuthenticationService.loggedInUser().getPk(),
                 HttpMethod.POST,
                 request,
-                new ParameterizedTypeReference<EventObject>(){});
-    }
-
-    public void invite(int eventFk, int userFk){
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.exchange(
-                URL + "invite/" + eventFk + "/" + userFk,
-                HttpMethod.POST,
-                null,
-                new ParameterizedTypeReference<EventObject>(){});
-    }
-
-    public void uninvite(int eventFk, int userFk){
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.exchange(
-                URL + "uninvite/" + eventFk + "/" + userFk,
-                HttpMethod.DELETE,
-                null,
                 new ParameterizedTypeReference<EventObject>(){});
     }
 }

@@ -57,4 +57,22 @@ public class EventObject {
         }
         return null;
     }
+
+    @JsonIgnore
+    public int getAttendingCount(){
+        int count = 0;
+        for(EventUser eventUser : eventUsers){
+            if(eventUser.getResponse() != null && eventUser.getResponse().getPk() == Response.GOING) count++;
+        }
+        return count;
+    }
+
+    @JsonIgnore
+    public int getNoResponseCount(){
+        int count = 0;
+        for(EventUser eventUser : eventUsers){
+            if(eventUser.getResponse() == null) count++;
+        }
+        return count;
+    }
 }

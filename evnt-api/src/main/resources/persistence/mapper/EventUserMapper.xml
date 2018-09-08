@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="evntapi.rest.mapper.EventUserMapper">
+    <resultMap id="eventUserResultMap" type="evntapi.domain.EventUser">
+        <result property="eventFk"      column="eurr_event_fk"/>
+        <result property="userFk"       column="eurr_user_fk"/>
+        <result property="roleFk"       column="eurr_role_fk"/>
+        <result property="responseFk"   column="eurr_response_fk"/>
+        <result property="responseDate" column="eurr_response_date"/>
+
+        <association property="user" resultMap="evntapi.rest.mapper.UserMapper.userResultMap"/>
+        <association property="role" resultMap="evntapi.rest.mapper.RoleMapper.roleResultMap"/>
+        <association property="response" resultMap="evntapi.rest.mapper.ResponseMapper.responseResultMap"/>
+    </resultMap>
+
+    <sql id="eventUserSelectCols">
+        eurr.event_fk as eurr_event_fk,
+        eurr.user_fk as eurr_user_fk,
+        eurr.role_fk as eurr_role_fk,
+        eurr.response_fk as eurr_response_fk,
+        eurr.response_date as eurr_response_date,
+        <include refid="evntapi.rest.mapper.UserMapper.userSelectCols"/>,
+        <include refid="evntapi.rest.mapper.RoleMapper.roleSelectCols"/>,
+        <include refid="evntapi.rest.mapper.ResponseMapper.responseSelectCols"/>
+    </sql>
+
+    <sql id="eventUserTables">
+        event_user_role_response eurr
+        left join user on (eurr.user_fk = user.pk)
+        left join role on (eurr.role_fk = role.pk)
+        left join response on (eurr.response_fk = response.pk)
+        left join user_security_role usr on (usr.user_fk = user.pk)
+        left join security_role securityRole on (securityRole.pk = usr.security_role_fk)
+    </sql>
+
+    <select id="findByEventFk" resultMap="eventUserResultMap">
+        select
+        <include refid="eventUserSelectCols"/>
+        from
+        <include refid="eventUserTables"/>
+        where
+        eurr.event_fk = #{eventFk}
+    </select>
+
+    <insert id="insert" parameterType="evntapi.domain.EventUser">
+        insert into
+        event_user_role_response(event_fk, user_fk, role_fk, response_fk, response_date)
+        values
+        (#{eventFk},
+        #{userFk},
+        #{roleFk},
+        #{responseFk},
+        #{responseDate})
+    </insert>
+
+    <update id="update" parameterType="evntapi.domain.EventUser">
+        update
+        event_user_role_response
+        set
+        role_fk = #{roleFk},
+        response_fk = #{responseFk},
+        response_date = #{responseDate}
+        where
+        event_fk = #{eventFk}
+        and
+        user_fk = #{userFk}
+    </update>
+
+    <delete id="delete">
+        delete from
+        event_user_role_response
+        where
+        event_fk = #{eventFk}
+        and
+        user_fk = #{userFk}
+    </delete>
+
+</mapper>

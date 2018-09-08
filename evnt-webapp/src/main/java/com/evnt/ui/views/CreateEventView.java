@@ -57,7 +57,7 @@ public class CreateEventView extends AbstractView implements View {
                 .bind(EventObject::getStartDate, EventObject::setStartDate);
         DateTimeField endTimeField = new DateTimeField("End Time");
         binder.forField(endTimeField)
-                .withValidator(endTime -> endTime.isAfter(startTimeField.getValue()), "End Time must be after Start Time!")
+                .withValidator(endTime -> endTime == null || endTime.isAfter(startTimeField.getValue()), "End Time must be after Start Time!")
                 .withConverter(new LocalDateTimeToDateConverter(ZoneId.systemDefault()))
                 .bind(EventObject::getEndDate, EventObject::setEndDate);
         RichTextArea descriptionRichTextArea = new RichTextArea("Description");
@@ -79,9 +79,7 @@ public class CreateEventView extends AbstractView implements View {
             binder.writeBeanIfValid(eventObject);
             createEvent(eventObject);
         });
-        binder.addValueChangeListener(change ->{
-            createEventButton.setEnabled(binder.isValid());
-        });
+        binder.addValueChangeListener(change -> createEventButton.setEnabled(binder.isValid()));
 
         addComponent(titleField);
         addComponent(locationField);
@@ -98,7 +96,7 @@ public class CreateEventView extends AbstractView implements View {
         Notification success = new Notification("Successfully created event!");
         success.setDelayMsec(3000);
         success.show(Page.getCurrent());
-        EvntWebappUI.getUiService().postNavigationEvent(this, MainView.NAME);
+        EvntWebappUI.getUiService().postNavigationEvent(this, ViewEventView.NAME+"/?eventPk="+eventObject.getPk());
     }
 
     @Override
