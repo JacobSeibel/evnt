@@ -66,15 +66,34 @@ public class EventDelegateService{
     /*
     ##### POST #####
      */
-    public void insert(EventObject event){
+    public EventObject insert(EventObject event){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<EventObject> request = new HttpEntity<>(event, headers);
-        restTemplate.exchange(
-                URL+userAuthenticationService.loggedInUser().getPk(),
-                HttpMethod.POST,
-                request,
-                new ParameterizedTypeReference<EventObject>(){});
+        ResponseEntity<EventObject> response =
+                restTemplate.exchange(
+                    URL+userAuthenticationService.loggedInUser().getPk(),
+                    HttpMethod.POST,
+                    request,
+                    new ParameterizedTypeReference<EventObject>(){});
+        return response.getBody();
+    }
+
+    /*
+    ##### PUT #####
+     */
+    public EventObject update(EventObject event){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<EventObject> request = new HttpEntity<>(event, headers);
+        ResponseEntity<EventObject> response =
+                restTemplate.exchange(
+                        URL,
+                        HttpMethod.PUT,
+                        request,
+                        new ParameterizedTypeReference<EventObject>(){});
+        return response.getBody();
     }
 }

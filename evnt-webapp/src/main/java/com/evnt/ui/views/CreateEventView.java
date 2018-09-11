@@ -1,31 +1,26 @@
 package com.evnt.ui.views;
 
 import com.evnt.domain.EventObject;
+import com.evnt.domain.EventUser;
+import com.evnt.domain.Role;
 import com.evnt.domain.SecurityRole;
-import com.evnt.domain.User;
 import com.evnt.persistence.EventDelegateService;
 import com.evnt.persistence.UserDelegateService;
+import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
+import com.evnt.util.ParamUtils;
 import com.vaadin.data.Binder;
-import com.vaadin.data.ValueProvider;
 import com.vaadin.data.converter.LocalDateTimeToDateConverter;
 import com.vaadin.data.converter.LocalDateToDateConverter;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Page;
-import com.vaadin.server.Setter;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.annotation.PostConstruct;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @Slf4j
@@ -38,10 +33,23 @@ public class CreateEventView extends AbstractView implements View {
     private UserDelegateService userService;
     @Autowired
     private EventDelegateService eventService;
+    @Autowired
+    private UserAuthenticationService userAuthService;
 
-    @PostConstruct
-    void init() {
+    private EventObject eventObject;
+    private boolean isEdit;
+
+    private void build() {
+        if(eventObject != null) {
+            EventUser thisUserOnEvent = eventObject.findUserOnEvent(userAuthService.loggedInUser().getPk());
+            if (thisUserOnEvent == null || !(thisUserOnEvent.getRoleFk() == Role.CREATOR || thisUserOnEvent.getRoleFk() == Role.HOST)) {
+                EvntWebappUI.getUiService().postNavigationEvent(this, AccessDeniedView.NAME);
+                return;
+            }
+        }
+
         Binder<EventObject> binder = new Binder<>();
+        binder.setBean(eventObject);
 
         TextField titleField = new TextField("Title");
         binder.forField(titleField)
@@ -72,12 +80,11 @@ public class CreateEventView extends AbstractView implements View {
                 .withConverter(new LocalDateToDateConverter(ZoneId.systemDefault()))
                 .bind(EventObject::getRsvpDate, EventObject::setRsvpDate);
 
-        Button createEventButton = new Button("Create Event");
+        Button createEventButton = new Button(isEdit ? "Update Event" : "Create Event");
         createEventButton.setEnabled(false);
         createEventButton.addClickListener(click -> {
-            EventObject eventObject = new EventObject();
             binder.writeBeanIfValid(eventObject);
-            createEvent(eventObject);
+            createEvent();
         });
         binder.addValueChangeListener(change -> createEventButton.setEnabled(binder.isValid()));
 
@@ -91,16 +98,25 @@ public class CreateEventView extends AbstractView implements View {
         addComponent(createEventButton);
     }
 
-    private void createEvent(EventObject eventObject){
-        eventService.insert(eventObject);
-        Notification success = new Notification("Successfully created event!");
+    private void createEvent(){
+        eventObject = isEdit ? eventService.update(eventObject) : eventService.insert(eventObject);
+        Notification success = new Notification("Successfully "+ (isEdit ? "updated" : "created") + " event!");
         success.setDelayMsec(3000);
         success.show(Page.getCurrent());
+        if(isEdit) notifyInvitees();
         EvntWebappUI.getUiService().postNavigationEvent(this, ViewEventView.NAME+"/?eventPk="+eventObject.getPk());
+    }
+
+    private void notifyInvitees(){
+        //TODO: Notify invitees that the event has been updated
     }
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        // This view is constructed in the init() method()
+        Integer eventPk = ParamUtils.getIntegerParam("eventPk");
+        eventObject = eventService.findByPk(eventPk);
+        isEdit = eventObject != null;
+
+        build();
     }
 }

@@ -50,7 +50,7 @@ public class ViewEventView extends AbstractView {
 
         if(thisUserOnEvent.getRoleFk() != Role.CREATOR) {
             HorizontalLayout askForResponseBanner = new HorizontalLayout();
-            String selectResponseString = thisUserOnEvent.getResponse() != null ? "You are " : "Let "+event.getCreator().getDisplayName()+" know if you can make it!";
+            String selectResponseString = thisUserOnEvent.getResponse() != null ? "You responded:" : "Let "+event.getCreator().getDisplayName()+" know if you can make it!";
             Label selectResponseLabel = new Label(selectResponseString);
             HorizontalLayout buttonLayout = new HorizontalLayout();
             for (Response response : responseService.findAll()) {
@@ -68,6 +68,11 @@ public class ViewEventView extends AbstractView {
             }
             askForResponseBanner.addComponents(selectResponseLabel, buttonLayout);
             addComponent(askForResponseBanner);
+        }
+        if(thisUserOnEvent.getRoleFk() == Role.CREATOR || thisUserOnEvent.getRoleFk() == Role.HOST){
+            Button editBtn = new Button("Edit");
+            editBtn.addClickListener(click -> EvntWebappUI.getUiService().postNavigationEvent(this, CreateEventView.NAME+"/?eventPk=" + event.getPk()));
+            addComponent(editBtn);
         }
 
         //TODO: Event Photo

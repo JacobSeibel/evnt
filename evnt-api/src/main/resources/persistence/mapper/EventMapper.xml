@@ -86,4 +86,21 @@
             #{eventPhoto},
             #{isActive})
     </insert>
+
+    <update id="update" parameterType="evntapi.domain.Event">
+        update
+            event
+        set
+            name = #{name},
+            location = #{location},
+            start_date = #{startDate},
+            end_date = #{endDate},
+            description = #{description},
+            allow_maybes = #{allowMaybes},
+            rsvp_date = #{rsvpDate},
+            event_photo = #{eventPhoto},
+            is_active = #{isActive}
+        where
+            pk = #{pk}
+    </update>
 </mapper>

@@ -42,4 +42,10 @@ public class EventController {
     public Event insert(@PathVariable("creatorFk") int creatorFk, @RequestBody Event event){
         return eventService.insert(event, creatorFk);
     }
+
+    @PutMapping
+    @ResponseStatus(HttpStatus.OK)
+    public Event update(@RequestBody Event event){
+        return eventService.update(event);
+    }
 }

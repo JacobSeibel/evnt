@@ -14,4 +14,5 @@ public interface EventService {
     Event findByPk(int pk);
     List<Event> findByUserFk(int userFk);
     Event insert(Event event, int creatorFk);
+    Event update(Event event);
 }

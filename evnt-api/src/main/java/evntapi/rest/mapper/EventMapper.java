@@ -13,4 +13,5 @@ public interface EventMapper {
     Event findByPk(int pk);
     List<Event> findByUserFk(int userFk);
     void insert(Event event);
+    void update(Event event);
 }

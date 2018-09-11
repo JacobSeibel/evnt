@@ -17,6 +17,6 @@ public class Response {
 
     @Override
     public boolean equals(Object obj) {
-        return getClass() == obj.getClass() && ((Response) obj).getPk().equals(pk);
+        return obj != null && getClass() == obj.getClass() && ((Response) obj).getPk().equals(pk);
     }
 }

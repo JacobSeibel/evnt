@@ -45,4 +45,10 @@ public class EventServiceImpl implements EventService{
         eventUserMapper.insert(creator);
         return event;
     }
+
+    @Override
+    public Event update(Event event){
+        mapper.update(event);
+        return event;
+    }
 }
