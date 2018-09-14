@@ -4,16 +4,18 @@
 
 <mapper namespace="evntapi.rest.mapper.EventMapper">
     <resultMap id="eventResultMap" type="evntapi.domain.Event">
-        <id     property="pk"          column="event_pk"/>
-        <result property="name"        column="event_name"/>
-        <result property="location"    column="event_location"/>
-        <result property="startDate"   column="event_start_date"/>
-        <result property="endDate"     column="event_end_date"/>
-        <result property="description" column="event_description"/>
-        <result property="allowMaybes" column="event_allow_maybes"/>
-        <result property="rsvpDate"    column="event_rsvp_date"/>
-        <result property="isActive"    column="event_is_active"/>
+        <id     property="pk"           column="event_pk"/>
+        <result property="name"         column="event_name"/>
+        <result property="location"     column="event_location"/>
+        <result property="startDate"    column="event_start_date"/>
+        <result property="endDate"      column="event_end_date"/>
+        <result property="description"  column="event_description"/>
+        <result property="allowMaybes"  column="event_allow_maybes"/>
+        <result property="rsvpDate"     column="event_rsvp_date"/>
+        <result property="eventPhotoFk" column="event_photo_fk"/>
+        <result property="isActive"     column="event_is_active"/>
 
+        <association property="eventPhoto" resultMap="evntapi.rest.mapper.PositionedImageMapper.positionedImageResultMap"/>
         <collection property="eventUsers" resultMap="evntapi.rest.mapper.EventUserMapper.eventUserResultMap"/>
     </resultMap>
 
@@ -31,7 +33,8 @@
         <include refid="evntapi.rest.mapper.EventUserMapper.eventUserSelectCols"/>,
         <include refid="evntapi.rest.mapper.UserMapper.userSelectCols"/>,
         <include refid="evntapi.rest.mapper.RoleMapper.roleSelectCols"/>,
-        <include refid="evntapi.rest.mapper.ResponseMapper.responseSelectCols"/>
+        <include refid="evntapi.rest.mapper.ResponseMapper.responseSelectCols"/>,
+        <include refid="evntapi.rest.mapper.PositionedImageMapper.positionedImageSelectCols"/>
     </sql>
 
     <sql id="eventTables">
@@ -42,6 +45,7 @@
         left join response on (eurr.response_fk = response.pk)
         left join user_security_role usr on (usr.user_fk = user.pk)
         left join security_role securityRole on (securityRole.pk = usr.security_role_fk)
+        left join positioned_image on (event.event_photo_fk = positioned_image.pk)
     </sql>
 
     <select id="findAll" resultMap="eventResultMap">
@@ -83,7 +87,7 @@
             #{description},
             #{allowMaybes},
             #{rsvpDate},
-            #{eventPhoto},
+            #{eventPhoto.pk},
             #{isActive})
     </insert>
 
@@ -98,7 +102,7 @@
             description = #{description},
             allow_maybes = #{allowMaybes},
             rsvp_date = #{rsvpDate},
-            event_photo = #{eventPhoto},
+            event_photo_fk = #{eventPhoto.pk},
             is_active = #{isActive}
         where
             pk = #{pk}

@@ -45,5 +45,6 @@ dependencies {
     compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.0.7.RELEASE'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.4'
     compile group: 'com.google.guava', name: 'guava', version: '11.0.2'
+    compile group: 'org.vaadin.liveimageeditor', name: 'live-image-editor', version: '2.0'
     testCompile("junit:junit")
 }

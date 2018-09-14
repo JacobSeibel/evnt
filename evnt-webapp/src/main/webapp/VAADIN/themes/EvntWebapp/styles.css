@@ -14779,3 +14779,12 @@ div.v-layout.v-horizontal.v-widget {
 	width: 19px;
 	overflow: hidden;
 }
+
+.EvntWebapp .v-panel-content-no-scroll {
+	overflow: hidden;
+}
+
+.EvntWebapp .v-panel-content-repositionable:hover {
+	opacity: 0.8;
+	cursor: pointer;
+}

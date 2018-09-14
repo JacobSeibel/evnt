@@ -1,13 +1,14 @@
 package evntapi.domain;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.io.File;
 import java.util.List;
 
-@Getter @Setter @ToString
+@Getter @Setter @ToString @NoArgsConstructor
 public class User {
     private int pk;
     private String username;
@@ -21,4 +22,8 @@ public class User {
     private String lastName;
 
     private List<SecurityRole> securityRoles;
+
+    public User(int pk){
+        this.pk = pk;
+    }
 }

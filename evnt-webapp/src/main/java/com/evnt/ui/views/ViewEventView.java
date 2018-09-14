@@ -1,22 +1,27 @@
 package com.evnt.ui.views;
 
 import com.evnt.domain.*;
-import com.evnt.persistence.EventDelegateService;
-import com.evnt.persistence.EventUserDelegateService;
-import com.evnt.persistence.ResponseDelegateService;
-import com.evnt.persistence.UserDelegateService;
+import com.evnt.persistence.*;
 import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
+import com.evnt.ui.Theme;
 import com.evnt.ui.components.ManageInvitesOverlay;
+import com.evnt.ui.components.RepositionableImage;
 import com.evnt.util.DateUtils;
 import com.evnt.util.ParamUtils;
 import com.vaadin.data.provider.GridSortOrder;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.server.Resource;
+import com.vaadin.server.StreamResource;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
+
+import javax.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 @Secured(SecurityRole.ROLE_USER)
 @SpringView(name = ViewEventView.NAME)
@@ -29,6 +34,8 @@ public class ViewEventView extends AbstractView {
     @Autowired
     private EventUserDelegateService eventUserService;
     @Autowired
+    private RoleDelegateService roleService;
+    @Autowired
     private UserDelegateService userService;
     @Autowired
     private ResponseDelegateService responseService;
@@ -36,9 +43,10 @@ public class ViewEventView extends AbstractView {
     public final static String NAME = "view-event";
 
     private EventObject event = null;
-    private Grid<EventUser> inviteesGrid = null;
     private Layout invitedLayout = null;
     private EventUser thisUserOnEvent = null;
+    private boolean isHost = false;
+    private RepositionableImage eventPhotoImage = null;
 
     @SuppressWarnings("unchecked")
     private void build(){
@@ -48,7 +56,7 @@ public class ViewEventView extends AbstractView {
             return;
         }
 
-        if(thisUserOnEvent.getRoleFk() != Role.CREATOR) {
+        if(!Role.isCreator(thisUserOnEvent.getRole())) {
             HorizontalLayout askForResponseBanner = new HorizontalLayout();
             String selectResponseString = thisUserOnEvent.getResponse() != null ? "You responded:" : "Let "+event.getCreator().getDisplayName()+" know if you can make it!";
             Label selectResponseLabel = new Label(selectResponseString);
@@ -69,15 +77,25 @@ public class ViewEventView extends AbstractView {
             askForResponseBanner.addComponents(selectResponseLabel, buttonLayout);
             addComponent(askForResponseBanner);
         }
-        if(thisUserOnEvent.getRoleFk() == Role.CREATOR || thisUserOnEvent.getRoleFk() == Role.HOST){
+        if(Role.isCreator(thisUserOnEvent.getRole()) || Role.isHost(thisUserOnEvent.getRole())){
+            isHost = true;
             Button editBtn = new Button("Edit");
             editBtn.addClickListener(click -> EvntWebappUI.getUiService().postNavigationEvent(this, CreateEventView.NAME+"/?eventPk=" + event.getPk()));
             addComponent(editBtn);
         }
 
-        //TODO: Event Photo
-
         Label eventTitleLabel = new Label(event.getName());
+
+        eventPhotoImage = new RepositionableImage(true);
+        eventPhotoImage.getImage().setSource(
+                new StreamResource((StreamResource.StreamSource) () ->
+                        new ByteArrayInputStream(event.getEventPhoto().getImage()), "streamedSourceFromByteArray"));
+
+        Button testButton = new Button("TEST");
+        testButton.addClickListener(click -> {
+            eventPhotoImage.setScrollTop(event.getEventPhoto().getScrollTop());
+        });
+
         Label locationLabel = new Label(event.getLocation());
         locationLabel.setCaption("Location");
         Label startDateLabel = new Label(DateUtils.getPresentableDate(event.getStartDate()));
@@ -86,15 +104,9 @@ public class ViewEventView extends AbstractView {
         descriptionRichTextArea.setValue(event.getDescription());
         descriptionRichTextArea.setReadOnly(true);
 
-        inviteesGrid = new Grid<>();
-        inviteesGrid.setItems(event.getEventUsers());
-        Grid.Column nameColumn = inviteesGrid.addColumn(user -> user.getUser().getDisplayName() + (user.getRoleFk() == Role.CREATOR || user.getRoleFk() == Role.HOST ? " ("+user.getRole().getName()+")" : "")).setCaption("Name");
-        Grid.Column responseColumn = inviteesGrid.addColumn(user -> user.getResponse() != null ? user.getResponse().getName() : "");
-        inviteesGrid.addColumn(EventUser::getResponseDate);
-
-        inviteesGrid.setSortOrder(GridSortOrder.asc(responseColumn).thenDesc(nameColumn));
-
         addComponent(eventTitleLabel);
+        addComponent(eventPhotoImage);
+        addComponent(testButton);
         addComponent(locationLabel);
         addComponent(startDateLabel);
         if(event.getEndDate() != null) {
@@ -102,16 +114,17 @@ public class ViewEventView extends AbstractView {
             endDateLabel.setCaption("End Time");
             addComponent(endDateLabel);
         }
-        addComponent(descriptionRichTextArea);
         invitedLayout = new HorizontalLayout(getInvitedComponent());
         addComponent(invitedLayout);
+        addComponent(descriptionRichTextArea);
 
-        addComponent(inviteesGrid);
+        eventPhotoImage.setScrollLeft(event.getEventPhoto().getScrollLeft());
+        eventPhotoImage.setScrollTop(event.getEventPhoto().getScrollTop());
     }
 
     private Component getInvitedComponent(){
         String invitedCountString = event.getAttendingCount() + " Attending, "+event.getNoResponseCount()+" Invited";
-        if(thisUserOnEvent.getRoleFk() == Role.HOST || thisUserOnEvent.getRoleFk() == Role.CREATOR){
+        if(Role.isHost(thisUserOnEvent.getRole()) || Role.isCreator(thisUserOnEvent.getRole())){
             Button manageInvites = new Button(invitedCountString);
             manageInvites.addClickListener(click -> launchManageInvitesOverlay());
             return manageInvites;
@@ -121,9 +134,8 @@ public class ViewEventView extends AbstractView {
     }
 
     private void launchManageInvitesOverlay() {
-        ManageInvitesOverlay manageInvitesOverlay = new ManageInvitesOverlay(event, userService, eventService, eventUserService);
+        ManageInvitesOverlay manageInvitesOverlay = new ManageInvitesOverlay(event, isHost, userService, eventUserService, roleService);
         manageInvitesOverlay.addCloseListener(close -> {
-            inviteesGrid.setItems(eventUserService.findByEventFk(event.getPk()));
             invitedLayout.removeAllComponents();
             invitedLayout.addComponent(getInvitedComponent());
         });
@@ -136,10 +148,15 @@ public class ViewEventView extends AbstractView {
     }
 
     @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
+    public void enter(ViewChangeListener.ViewChangeEvent changeEvent) {
         Integer eventPk = ParamUtils.getIntegerParam("eventPk");
         this.event = eventService.findByPk(eventPk);
 
         build();
+
+        EvntWebappUI.getUiService();
+
+        eventPhotoImage.setScrollLeft(this.event.getEventPhoto().getScrollLeft());
+        eventPhotoImage.setScrollTop(this.event.getEventPhoto().getScrollTop());
     }
 }

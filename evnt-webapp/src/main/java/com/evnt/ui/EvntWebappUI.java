@@ -28,7 +28,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 
 @SpringUI(path = "")
-@Theme("valo")
+@Theme("EvntWebapp")
 @PreserveOnRefresh
 public class EvntWebappUI extends UI {
 

@@ -4,10 +4,6 @@
 
 <mapper namespace="evntapi.rest.mapper.EventUserMapper">
     <resultMap id="eventUserResultMap" type="evntapi.domain.EventUser">
-        <result property="eventFk"      column="eurr_event_fk"/>
-        <result property="userFk"       column="eurr_user_fk"/>
-        <result property="roleFk"       column="eurr_role_fk"/>
-        <result property="responseFk"   column="eurr_response_fk"/>
         <result property="responseDate" column="eurr_response_date"/>
 
         <association property="user" resultMap="evntapi.rest.mapper.UserMapper.userResultMap"/>
@@ -16,10 +12,6 @@
     </resultMap>
 
     <sql id="eventUserSelectCols">
-        eurr.event_fk as eurr_event_fk,
-        eurr.user_fk as eurr_user_fk,
-        eurr.role_fk as eurr_role_fk,
-        eurr.response_fk as eurr_response_fk,
         eurr.response_date as eurr_response_date,
         <include refid="evntapi.rest.mapper.UserMapper.userSelectCols"/>,
         <include refid="evntapi.rest.mapper.RoleMapper.roleSelectCols"/>,
@@ -48,10 +40,10 @@
         insert into
         event_user_role_response(event_fk, user_fk, role_fk, response_fk, response_date)
         values
-        (#{eventFk},
-        #{userFk},
-        #{roleFk},
-        #{responseFk},
+        (#{event.pk},
+        #{user.pk},
+        #{role.pk},
+        #{response.pk},
         #{responseDate})
     </insert>
 
@@ -59,22 +51,22 @@
         update
         event_user_role_response
         set
-        role_fk = #{roleFk},
-        response_fk = #{responseFk},
+        role_fk = #{role.pk},
+        response_fk = #{response.pk},
         response_date = #{responseDate}
         where
-        event_fk = #{eventFk}
+        event_fk = #{event.pk}
         and
-        user_fk = #{userFk}
+        user_fk = #{user.pk}
     </update>
 
     <delete id="delete">
         delete from
         event_user_role_response
         where
-        event_fk = #{eventFk}
+        event_fk = #{event.pk}
         and
-        user_fk = #{userFk}
+        user_fk = #{user.pk}
     </delete>
 
 </mapper>

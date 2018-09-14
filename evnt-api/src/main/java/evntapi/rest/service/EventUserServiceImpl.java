@@ -2,6 +2,7 @@ package evntapi.rest.service;
 
 import evntapi.domain.EventUser;
 import evntapi.domain.Role;
+import evntapi.domain.User;
 import evntapi.rest.mapper.EventUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,8 @@ public class EventUserServiceImpl implements EventUserService{
     public EventUser insert(int eventFk, int userFk) {
         EventUser creator = new EventUser();
         creator.setEventFk(eventFk);
-        creator.setUserFk(userFk);
-        creator.setRoleFk(Role.GUEST);
+        creator.setUser(new User(userFk));
+        creator.setRole(new Role(Role.GUEST));
         mapper.insert(creator);
         return creator;
     }

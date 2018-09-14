@@ -3,5 +3,12 @@
 @mixin evntwebapp {
 	@include valo;
 
-	/* Add your theme selectors here */
+	.v-panel-content-no-scroll {
+	    overflow: hidden;
+	}
+
+	.v-panel-content-repositionable:hover{
+    	opacity: .8;
+    	cursor: pointer;
+    }
 }

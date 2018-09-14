@@ -12,7 +12,8 @@ public class ParamUtils {
     }
 
     public static Integer getIntegerParam(String paramName){
-        return Integer.parseInt(getParamMap().get(paramName));
+        Map<String, String> paramMap = getParamMap();
+        return paramMap.isEmpty() ? null : Integer.parseInt(paramMap.get(paramName));
     }
 
     private static Map<String, String> getParamMap(){

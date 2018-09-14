@@ -14,4 +14,16 @@ public class Role {
     private String name;
     private String description;
     private boolean isActive;
+
+    public static boolean isCreator(Role role){
+        return role != null && role.pk == CREATOR;
+    }
+
+    public static boolean isHost(Role role){
+        return role != null && role.pk == HOST;
+    }
+
+    public static boolean isGuest(Role role){
+        return role != null && role.pk == GUEST;
+    }
 }

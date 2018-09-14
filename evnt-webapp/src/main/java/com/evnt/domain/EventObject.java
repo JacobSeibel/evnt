@@ -24,8 +24,7 @@ public class EventObject {
     private String description;
     private boolean allowMaybes;
     private Date rsvpDate;
-    //TODO: Figure this out
-    private File eventPhoto;
+    private PositionedImage eventPhoto;
     private boolean isActive = true;
 
     private List<EventUser> eventUsers;
@@ -33,7 +32,7 @@ public class EventObject {
     @JsonIgnore
     public User getCreator(){
         for (EventUser eventUser : eventUsers){
-            if(eventUser.getRoleFk() == Role.CREATOR){
+            if(Role.isCreator(eventUser.getRole())){
                 return eventUser.getUser();
             }
         }
@@ -44,7 +43,7 @@ public class EventObject {
     public List<User> getHosts(){
         List<User> hosts = new ArrayList<>();
         for (EventUser eventUser : eventUsers){
-            if(eventUser.getRoleFk() == Role.CREATOR || eventUser.getRoleFk() == Role.HOST){
+            if(Role.isCreator(eventUser.getRole()) || Role.isHost(eventUser.getRole())){
                 hosts.add(eventUser.getUser());
             }
         }
@@ -53,7 +52,7 @@ public class EventObject {
 
     public EventUser findUserOnEvent(int userPk){
         for(EventUser eventUser : eventUsers){
-            if(eventUser.getUserFk() == userPk) return eventUser;
+            if(eventUser.getUser().getPk() == userPk) return eventUser;
         }
         return null;
     }
