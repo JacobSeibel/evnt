@@ -5,8 +5,6 @@ import com.evnt.persistence.EventDelegateService;
 import com.evnt.persistence.UserDelegateService;
 import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
-import com.evnt.ui.Theme;
-import com.evnt.ui.components.RepositionableImage;
 import com.evnt.util.ParamUtils;
 import com.vaadin.data.Binder;
 import com.vaadin.data.converter.LocalDateTimeToDateConverter;
@@ -18,6 +16,7 @@ import com.vaadin.server.Page;
 import com.vaadin.server.StreamResource;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -44,7 +43,7 @@ public class CreateEventView extends AbstractView implements View {
     private boolean isEdit;
 
     private void build() {
-        if(eventObject != null) {
+        if(eventObject.getPk() != null) {
             EventUser thisUserOnEvent = eventObject.findUserOnEvent(userAuthService.loggedInUser().getPk());
             if (thisUserOnEvent == null || !(Role.isCreator(thisUserOnEvent.getRole()) || Role.isHost(thisUserOnEvent.getRole()))) {
                 EvntWebappUI.getUiService().postNavigationEvent(this, AccessDeniedView.NAME);
@@ -59,9 +58,33 @@ public class CreateEventView extends AbstractView implements View {
         binder.forField(titleField)
                 .asRequired("Title is required!")
                 .bind(EventObject::getName, EventObject::setName);
-        Image editedImage = new Image();
-        RepositionableImage image = new RepositionableImage(isEdit);
+        Image oldImage = new Image();
+        oldImage.setWidth("100%");
+        if(isEdit){
+            oldImage.setSource(
+                    new StreamResource((StreamResource.StreamSource) () ->
+                            new ByteArrayInputStream(eventObject.getEventPhoto()), eventObject.getName()));
+        }
 
+        class ImageReceiver implements LiveImageEditor.ImageReceiver {
+            @Getter
+            InputStream inputStream;
+
+            @Override
+            public void receiveImage(InputStream inputStream) {
+                this.inputStream = inputStream;
+            }
+        }
+
+        ImageReceiver imageReceiver = new ImageReceiver();
+
+        LiveImageEditor imageEditor = new LiveImageEditor(imageReceiver);
+        imageEditor.setWidth("100%");
+        imageEditor.setHeight("400px");
+        VerticalLayout editorLayout = new VerticalLayout(imageEditor);
+        editorLayout.setVisible(false);
+        editorLayout.addLayoutClickListener(click -> imageEditor.requestEditedImage());
+        editorLayout.setMargin(false);
 
         // Implement both receiver that saves upload in a file and
         // listener for successful upload
@@ -87,32 +110,33 @@ public class CreateEventView extends AbstractView implements View {
             }
 
             public void uploadSucceeded(Upload.SucceededEvent event) {
-                // Show the uploaded file in the image viewer
-                image.getImage().setSource(new FileResource(file));
+                try {
+                    editorLayout.setVisible(true);
+                    imageEditor.setImage(Files.readAllBytes(file.toPath()));
+                    imageEditor.resetTransformations();
+                } catch (final java.io.IOException e) {
+                    new Notification("Could not upload file!",
+                            e.getMessage(),
+                            Notification.Type.ERROR_MESSAGE)
+                            .show(Page.getCurrent());
+                }
             }
         }
-        ImageUploader receiver = new ImageUploader();
-        LiveImageEditor imageEditor = new LiveImageEditor(new LiveImageEditor.ImageReceiver() {
-            @Override
-            public void receiveImage(InputStream inputStream) {
-                StreamResource resource = new StreamResource(() -> inputStream, "edited-image-" + System.currentTimeMillis());
-                editedImage.setSource(resource);
-            }
-        });
-        imageEditor.setWidth("100%");
-        imageEditor.setHeight("400px");
-        imageEditor.setVisible(false);
 
+        ImageUploader receiver = new ImageUploader();
 
         // Create the upload with a caption and set receiver later
         Upload upload = new Upload("Event Photo", receiver);
+        if(isEdit) upload.setButtonCaption("Change");
         upload.addSucceededListener(receiver);
         upload.addSucceededListener(success -> {
             try {
+                if(isEdit) oldImage.setVisible(false);
                 imageEditor.setVisible(true);
                 imageEditor.setImage(Files.readAllBytes(receiver.file.toPath()));
                 imageEditor.resetTransformations();
-                image.setEditable(true);
+                upload.setButtonCaption("Change");
+                if(!receiver.file.delete()) throw new IOException("Failed to Delete");
             } catch (final java.io.IOException e) {
                 new Notification("Could not upload file!",
                         e.getMessage(),
@@ -135,6 +159,7 @@ public class CreateEventView extends AbstractView implements View {
                 .withConverter(new LocalDateTimeToDateConverter(ZoneId.systemDefault()))
                 .bind(EventObject::getEndDate, EventObject::setEndDate);
         RichTextArea descriptionRichTextArea = new RichTextArea("Description");
+        descriptionRichTextArea.focus();
         binder.forField(descriptionRichTextArea)
                 .bind(EventObject::getDescription, EventObject::setDescription);
         CheckBox allowMaybesCheckbox = new CheckBox("Allow Maybes");
@@ -151,8 +176,13 @@ public class CreateEventView extends AbstractView implements View {
         createEventButton.addClickListener(click -> {
             binder.writeBeanIfValid(eventObject);
             try {
-                PositionedImage posImage = new PositionedImage(Files.readAllBytes(receiver.file.toPath()), image.getScrollTop(), image.getScrollLeft());
-                eventObject.setEventPhoto(posImage);
+                imageEditor.requestEditedImage();
+                ByteArrayInputStream bais = (ByteArrayInputStream)imageReceiver.getInputStream();
+                if(bais != null) {
+                    byte[] array = new byte[bais.available()];
+                    bais.read(array);
+                    eventObject.setEventPhoto(array);
+                }
             } catch (final java.io.IOException e) {
                 new Notification("Could not upload file!",
                         e.getMessage(),
@@ -165,8 +195,8 @@ public class CreateEventView extends AbstractView implements View {
         binder.addValueChangeListener(change -> createEventButton.setEnabled(binder.isValid()));
 
         addComponent(titleField);
-//        addComponent(image);
-        addComponent(imageEditor);
+        if(isEdit) addComponent(oldImage);
+        addComponent(editorLayout);
         addComponent(upload);
         addComponent(locationField);
         addComponent(startTimeField);
@@ -195,8 +225,8 @@ public class CreateEventView extends AbstractView implements View {
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
         Integer eventPk = ParamUtils.getIntegerParam("eventPk");
-        eventObject = eventPk != null ? eventService.findByPk(eventPk) : null;
-        isEdit = eventObject != null;
+        isEdit = eventPk != null;
+        eventObject = isEdit ? eventService.findByPk(eventPk) : new EventObject();
 
         build();
     }

@@ -40,7 +40,7 @@
         insert into
         event_user_role_response(event_fk, user_fk, role_fk, response_fk, response_date)
         values
-        (#{event.pk},
+        (#{eventFk},
         #{user.pk},
         #{role.pk},
         #{response.pk},

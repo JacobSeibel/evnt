@@ -18,9 +18,9 @@ public class Event {
     private String description;
     private boolean allowMaybes;
     private Date rsvpDate;
+    private byte[] eventPhoto;
     private boolean isActive;
     private User creator;
 
     private List<EventUser> eventUsers;
-    private PositionedImage eventPhoto;
 }

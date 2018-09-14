@@ -24,7 +24,7 @@ public class EventObject {
     private String description;
     private boolean allowMaybes;
     private Date rsvpDate;
-    private PositionedImage eventPhoto;
+    private byte[] eventPhoto;
     private boolean isActive = true;
 
     private List<EventUser> eventUsers;

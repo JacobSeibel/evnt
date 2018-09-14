@@ -38,6 +38,20 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+dependencyManagement {
+    imports {
+        mavenBom "com.vaadin:vaadin-bom:8.4.5"
+    }
+}
+
+vaadin {
+    version = '8.4.5' //Only use in conjunction with dependencyManagement{ } and mavenBom
+}
+
+vaadinSpringBoot {
+    starterVersion = '3.0.1'
+}
+
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
 //    compile("org.springframework.boot:spring-boot-starter-security")

@@ -4,24 +4,18 @@ import com.evnt.domain.*;
 import com.evnt.persistence.*;
 import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
-import com.evnt.ui.Theme;
 import com.evnt.ui.components.ManageInvitesOverlay;
-import com.evnt.ui.components.RepositionableImage;
 import com.evnt.util.DateUtils;
 import com.evnt.util.ParamUtils;
-import com.vaadin.data.provider.GridSortOrder;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
-import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 
 @Secured(SecurityRole.ROLE_USER)
 @SpringView(name = ViewEventView.NAME)
@@ -46,7 +40,6 @@ public class ViewEventView extends AbstractView {
     private Layout invitedLayout = null;
     private EventUser thisUserOnEvent = null;
     private boolean isHost = false;
-    private RepositionableImage eventPhotoImage = null;
 
     @SuppressWarnings("unchecked")
     private void build(){
@@ -86,15 +79,11 @@ public class ViewEventView extends AbstractView {
 
         Label eventTitleLabel = new Label(event.getName());
 
-        eventPhotoImage = new RepositionableImage(true);
-        eventPhotoImage.getImage().setSource(
+        Image eventPhotoImage = new Image();
+        eventPhotoImage.setSource(
                 new StreamResource((StreamResource.StreamSource) () ->
-                        new ByteArrayInputStream(event.getEventPhoto().getImage()), "streamedSourceFromByteArray"));
-
-        Button testButton = new Button("TEST");
-        testButton.addClickListener(click -> {
-            eventPhotoImage.setScrollTop(event.getEventPhoto().getScrollTop());
-        });
+                        new ByteArrayInputStream(event.getEventPhoto()), event.getName()));
+        eventPhotoImage.setWidth("100%");
 
         Label locationLabel = new Label(event.getLocation());
         locationLabel.setCaption("Location");
@@ -106,7 +95,6 @@ public class ViewEventView extends AbstractView {
 
         addComponent(eventTitleLabel);
         addComponent(eventPhotoImage);
-        addComponent(testButton);
         addComponent(locationLabel);
         addComponent(startDateLabel);
         if(event.getEndDate() != null) {
@@ -117,9 +105,6 @@ public class ViewEventView extends AbstractView {
         invitedLayout = new HorizontalLayout(getInvitedComponent());
         addComponent(invitedLayout);
         addComponent(descriptionRichTextArea);
-
-        eventPhotoImage.setScrollLeft(event.getEventPhoto().getScrollLeft());
-        eventPhotoImage.setScrollTop(event.getEventPhoto().getScrollTop());
     }
 
     private Component getInvitedComponent(){
@@ -153,10 +138,5 @@ public class ViewEventView extends AbstractView {
         this.event = eventService.findByPk(eventPk);
 
         build();
-
-        EvntWebappUI.getUiService();
-
-        eventPhotoImage.setScrollLeft(this.event.getEventPhoto().getScrollLeft());
-        eventPhotoImage.setScrollTop(this.event.getEventPhoto().getScrollTop());
     }
 }
