@@ -30,6 +30,8 @@ public class ViewEventView extends AbstractView {
     @Autowired
     private RoleDelegateService roleService;
     @Autowired
+    private MailDelegateService mailService;
+    @Autowired
     private UserDelegateService userService;
     @Autowired
     private ResponseDelegateService responseService;
@@ -80,9 +82,11 @@ public class ViewEventView extends AbstractView {
         Label eventTitleLabel = new Label(event.getName());
 
         Image eventPhotoImage = new Image();
-        eventPhotoImage.setSource(
-                new StreamResource((StreamResource.StreamSource) () ->
-                        new ByteArrayInputStream(event.getEventPhoto()), event.getName()));
+        if(event.getEventPhoto() != null) {
+            eventPhotoImage.setSource(
+                    new StreamResource((StreamResource.StreamSource) () ->
+                            new ByteArrayInputStream(event.getEventPhoto()), event.getName()));
+        }
         eventPhotoImage.setWidth("100%");
 
         Label locationLabel = new Label(event.getLocation());
@@ -119,7 +123,7 @@ public class ViewEventView extends AbstractView {
     }
 
     private void launchManageInvitesOverlay() {
-        ManageInvitesOverlay manageInvitesOverlay = new ManageInvitesOverlay(event, isHost, userService, eventUserService, roleService);
+        ManageInvitesOverlay manageInvitesOverlay = new ManageInvitesOverlay(event, isHost, userService, eventUserService, roleService, mailService, userAuthService);
         manageInvitesOverlay.addCloseListener(close -> {
             invitedLayout.removeAllComponents();
             invitedLayout.addComponent(getInvitedComponent());

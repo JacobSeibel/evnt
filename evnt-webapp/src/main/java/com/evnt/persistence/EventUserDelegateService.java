@@ -34,13 +34,16 @@ public class EventUserDelegateService {
     /*
     ##### POST #####
      */
-    public EventUser insert(int eventFk, int userFk){
+    public EventUser insert(EventUser eventUser){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<EventUser> request = new HttpEntity<>(eventUser, headers);
         ResponseEntity<EventUser> response =
                 restTemplate.exchange(
-                    URL + eventFk + "/" + userFk,
+                    URL,
                     HttpMethod.POST,
-                    null,
+                    request,
                     new ParameterizedTypeReference<EventUser>(){});
         return response.getBody();
     }

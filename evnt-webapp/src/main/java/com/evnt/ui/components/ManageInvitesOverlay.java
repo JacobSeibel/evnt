@@ -1,19 +1,17 @@
 package com.evnt.ui.components;
 
-import com.evnt.domain.EventObject;
-import com.evnt.domain.EventUser;
-import com.evnt.domain.Role;
-import com.evnt.domain.User;
-import com.evnt.persistence.EventDelegateService;
-import com.evnt.persistence.EventUserDelegateService;
-import com.evnt.persistence.RoleDelegateService;
-import com.evnt.persistence.UserDelegateService;
+import com.evnt.domain.*;
+import com.evnt.persistence.*;
+import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
 import com.evnt.ui.views.ViewEventView;
+import com.evnt.util.MailTemplate;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.*;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,23 +21,37 @@ public class ManageInvitesOverlay extends Window {
     private final UserDelegateService userService;
     private final EventUserDelegateService eventUserService;
     private final RoleDelegateService roleService;
+    private final MailDelegateService mailService;
+    private final UserAuthenticationService userAuthService;
 
     private final EventObject event;
     private final boolean isHost;
     private Grid<User> usersToInviteGrid;
+    private List<EventUser> usersToNotify = new ArrayList<>();
 
-    public ManageInvitesOverlay(EventObject event, boolean isHost, UserDelegateService userService, EventUserDelegateService eventUserService, RoleDelegateService roleService){
+    public ManageInvitesOverlay(
+            EventObject event,
+            boolean isHost,
+            UserDelegateService userService,
+            EventUserDelegateService eventUserService,
+            RoleDelegateService roleService,
+            MailDelegateService mailService,
+            UserAuthenticationService userAuthService){
         this.event = event;
         this.isHost = isHost;
         this.userService = userService;
         this.eventUserService = eventUserService;
         this.roleService = roleService;
+        this.mailService = mailService;
+        this.userAuthService = userAuthService;
         build();
         center();
         setClosable(true);
         setModal(true);
         setHeight("60%");
         setWidth("40%");
+
+        addCloseListener(close -> notifyUsers());
     }
 
     private void build(){
@@ -92,9 +104,20 @@ public class ManageInvitesOverlay extends Window {
 
     private Grid<User> getGrid(){
         Grid<User> usersToInviteGrid = new Grid<>();
-        usersToInviteGrid.setItems(userService.findActive());
+        List<User> users = userService.findActive();
+        users.sort((u1, u2) -> {
+            EventUser u1OnEvent = event.findUserOnEvent(u1.getPk());
+            EventUser u2OnEvent = event.findUserOnEvent(u2.getPk());
+            if((u1OnEvent != null && u2OnEvent != null) || (u1OnEvent == null && u2OnEvent == null)){
+                return u1.getDisplayName().toLowerCase().compareTo(u2.getDisplayName().toLowerCase());
+            }else if(u1OnEvent == null){
+                return -1;
+            }else{
+                return 1;
+            }
+        });
+        usersToInviteGrid.setItems(users);
 
-        //TODO: Make sure invited users sort first, then uninvited users last
         usersToInviteGrid.addColumn(user -> {
             String displayName = user.getDisplayName();
             EventUser eventUser = event.findUserOnEvent(user.getPk());
@@ -140,9 +163,14 @@ public class ManageInvitesOverlay extends Window {
     }
 
     private EventUser invite(User user){
-        EventUser eventUser = eventUserService.insert(event.getPk(), user.getPk());
+        EventUser eventUser = new EventUser();
+        eventUser.setEventFk(event.getPk());
+        eventUser.setRole(new Role(Role.GUEST));
+        eventUser.setUser(user);
+        eventUser = eventUserService.insert(eventUser);
         event.getEventUsers().add(eventUser);
         usersToInviteGrid.getDataProvider().refreshItem(user);
+        usersToNotify.add(eventUser);
         return eventUser;
     }
 
@@ -157,5 +185,12 @@ public class ManageInvitesOverlay extends Window {
                             uninviteBtn.setVisible(false);
                         },
                         click -> {}));
+    }
+
+    private void notifyUsers(){
+        //TODO - Get a difference list instead of building the list as users are invited
+        for(EventUser eventUser : usersToNotify){
+            mailService.send(MailTemplate.INSTANCE.getInvitedEmail(eventUser, userAuthService.loggedInUser().getDisplayName(), event));
+        }
     }
 }

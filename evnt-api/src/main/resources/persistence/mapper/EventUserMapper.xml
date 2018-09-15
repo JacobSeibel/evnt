@@ -64,9 +64,9 @@
         delete from
         event_user_role_response
         where
-        event_fk = #{event.pk}
+        event_fk = #{eventFk}
         and
-        user_fk = #{user.pk}
+        user_fk = #{userFk}
     </delete>
 
 </mapper>

@@ -22,10 +22,10 @@ public class EventUserController {
         return eventUserService.findByEventFk(eventFk);
     }
 
-    @PostMapping("/{eventFk}/{userFk}")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventUser invite(@PathVariable("eventFk") int eventFk, @PathVariable("userFk") int userFk){
-        return eventUserService.insert(eventFk, userFk);
+    public EventUser invite(@RequestBody EventUser eventUser){
+        return eventUserService.insert(eventUser);
     }
 
     @PutMapping

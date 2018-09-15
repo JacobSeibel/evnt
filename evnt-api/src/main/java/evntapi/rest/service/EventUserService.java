@@ -9,7 +9,7 @@ import java.util.List;
 @Service
 public interface EventUserService {
     List<EventUser> findByEventFk(int eventFk);
-    EventUser insert(int eventFk, int userFk);
+    EventUser insert(EventUser eventUser);
     void update(EventUser eventUser);
     void delete(int eventFk, int userFk);
 }

@@ -20,13 +20,9 @@ public class EventUserServiceImpl implements EventUserService{
     }
 
     @Override
-    public EventUser insert(int eventFk, int userFk) {
-        EventUser creator = new EventUser();
-        creator.setEventFk(eventFk);
-        creator.setUser(new User(userFk));
-        creator.setRole(new Role(Role.GUEST));
-        mapper.insert(creator);
-        return creator;
+    public EventUser insert(EventUser eventUser) {
+        mapper.insert(eventUser);
+        return eventUser;
     }
 
     @Override
