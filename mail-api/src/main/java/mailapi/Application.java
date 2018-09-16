@@ -8,6 +8,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
 @PropertySource("application.properties")
+@PropertySource("secure.properties")
 @Configuration
 //@ImportResource({"classpath*:applicationContext.xml"})
 public class Application {

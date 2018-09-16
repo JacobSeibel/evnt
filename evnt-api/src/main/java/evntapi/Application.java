@@ -8,10 +8,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.*;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
 
@@ -22,6 +19,7 @@ import java.util.Arrays;
 @Configuration
 @MapperScan(basePackages = "evntapi.rest.mapper", sqlSessionFactoryRef = "sqlSessionFactory")
 @ImportResource({"classpath*:applicationContext.xml"})
+@PropertySource("secure.properties")
 public class Application {
 
     public static void main(String[] args) {
