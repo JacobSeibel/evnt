@@ -27,7 +27,7 @@ public class ManageInvitesOverlay extends Window {
     private final EventObject event;
     private final boolean isHost;
     private Grid<User> usersToInviteGrid;
-    private List<EventUser> usersToNotify = new ArrayList<>();
+    private List<EventUser> usersAlreadyInvited;
 
     public ManageInvitesOverlay(
             EventObject event,
@@ -55,6 +55,8 @@ public class ManageInvitesOverlay extends Window {
     }
 
     private void build(){
+        usersAlreadyInvited = new ArrayList<>(event.getEventUsers());
+
         VerticalLayout content = new VerticalLayout();
         Label headerLabel = new Label("<h1>Manage Invites</h1>", ContentMode.HTML);
         content.addComponent(headerLabel);
@@ -170,7 +172,6 @@ public class ManageInvitesOverlay extends Window {
         eventUser = eventUserService.insert(eventUser);
         event.getEventUsers().add(eventUser);
         usersToInviteGrid.getDataProvider().refreshItem(user);
-        usersToNotify.add(eventUser);
         return eventUser;
     }
 
@@ -188,9 +189,10 @@ public class ManageInvitesOverlay extends Window {
     }
 
     private void notifyUsers(){
-        //TODO - Get a difference list instead of building the list as users are invited
-        for(EventUser eventUser : usersToNotify){
-            mailService.send(MailTemplate.INSTANCE.getInvitedEmail(eventUser, userAuthService.loggedInUser().getDisplayName(), event));
+        for(EventUser eu : event.getEventUsers()){
+            if(!usersAlreadyInvited.contains(eu)){
+                mailService.send(MailTemplate.INSTANCE.getInvitedEmail(eu, userAuthService.loggedInUser().getDisplayName(), event));
+            }
         }
     }
 }

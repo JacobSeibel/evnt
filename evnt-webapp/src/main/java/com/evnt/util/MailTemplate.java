@@ -47,6 +47,17 @@ public class MailTemplate {
         );
     }
 
+    public MailParams getEventIsSoonEmail(EventUser eventUser, EventObject event){
+        StringWriter sw = generateBody("eventIsSoon.ftl", event, new HashMap<>());
+
+        return MailParams.build(
+                eventUser.getUser().getEmail(),
+                null,
+                event.getName()+" is happening soon!",
+                sw.toString()
+        );
+    }
+
     public MailParams getRsvpReminderEmail(String toAddress, EventObject event){
         StringWriter sw = generateBody("rsvpReminder.ftl", event, new HashMap<>());
 
