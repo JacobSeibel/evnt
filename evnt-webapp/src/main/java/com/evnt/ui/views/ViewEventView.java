@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
 import java.io.ByteArrayInputStream;
+import java.util.Calendar;
 
 @Secured(SecurityRole.ROLE_USER)
 @SpringView(name = ViewEventView.NAME)
@@ -134,6 +135,22 @@ public class ViewEventView extends AbstractView {
     private void respond(EventUser eventUser, Response response){
         eventUser.changeResponse(response);
         eventUserService.update(eventUser);
+
+        //Send response 10 minutes from now
+        Calendar sendDateCalendar = Calendar.getInstance();
+        sendDateCalendar.add(Calendar.MINUTE, 10);
+        Email email = new Email(Email.EVENT_UPDATED);
+
+        for(User host : event.getHosts()){
+            QueuedEmail qe = new QueuedEmail(
+                    email,
+                    host,
+                    event,
+                    userAuthService.loggedInUser(),
+                    sendDateCalendar.getTime());
+
+            queuedEmailService.insert(qe);
+        }
     }
 
     @Override

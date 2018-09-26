@@ -184,6 +184,7 @@ public class ManageInvitesOverlay extends Window {
                         click -> {}));
     }
 
+    //TODO: Add Event Is Soon emails and RSVP Reminder email
     private void notifyUsers(){
         //Send invites 10 minutes from now
         Calendar sendDateCalendar = Calendar.getInstance();
@@ -208,6 +209,7 @@ public class ManageInvitesOverlay extends Window {
         //Cancel unsent invites for uninvited people
         for(EventUser eu : usersAlreadyInvited){
             if(!event.getEventUsers().contains(eu)){
+                //TODO: Make this work
 //                queuedEmailService.delete();
             }
         }

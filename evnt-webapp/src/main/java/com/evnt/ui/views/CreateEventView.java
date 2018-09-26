@@ -2,6 +2,7 @@ package com.evnt.ui.views;
 
 import com.evnt.domain.*;
 import com.evnt.persistence.EventDelegateService;
+import com.evnt.persistence.QueuedEmailDelegateService;
 import com.evnt.persistence.UserDelegateService;
 import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
@@ -11,7 +12,6 @@ import com.vaadin.data.converter.LocalDateTimeToDateConverter;
 import com.vaadin.data.converter.LocalDateToDateConverter;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.FileResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.StreamResource;
 import com.vaadin.spring.annotation.SpringView;
@@ -25,6 +25,7 @@ import org.vaadin.liveimageeditor.LiveImageEditor;
 import java.io.*;
 import java.nio.file.Files;
 import java.time.ZoneId;
+import java.util.Calendar;
 
 @Slf4j
 @Secured(SecurityRole.ROLE_USER)
@@ -38,6 +39,8 @@ public class CreateEventView extends AbstractView implements View {
     private EventDelegateService eventService;
     @Autowired
     private UserAuthenticationService userAuthService;
+    @Autowired
+    private QueuedEmailDelegateService queuedEmailService;
 
     private EventObject eventObject;
     private boolean isEdit;
@@ -212,12 +215,26 @@ public class CreateEventView extends AbstractView implements View {
         Notification success = new Notification("Successfully "+ (isEdit ? "updated" : "created") + " event!");
         success.setDelayMsec(3000);
         success.show(Page.getCurrent());
-        if(isEdit) notifyInvitees();
+        if(isEdit) notifyInviteesOfUpdate();
         EvntWebappUI.getUiService().postNavigationEvent(this, ViewEventView.NAME+"/?eventPk="+eventObject.getPk());
     }
 
-    private void notifyInvitees(){
-        //TODO: Notify invitees that the event has been updated
+    private void notifyInviteesOfUpdate(){
+        //Send updates 10 minutes from now
+        Calendar sendDateCalendar = Calendar.getInstance();
+        sendDateCalendar.add(Calendar.MINUTE, 10);
+        Email email = new Email(Email.EVENT_UPDATED);
+
+        for(EventUser eu : eventObject.getEventUsers()){
+            QueuedEmail qe = new QueuedEmail(
+                    email,
+                    eu.getUser(),
+                    eventObject,
+                    userAuthService.loggedInUser(),
+                    sendDateCalendar.getTime());
+
+            queuedEmailService.insert(qe);
+        }
     }
 
 

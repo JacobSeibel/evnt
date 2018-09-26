@@ -40,6 +40,8 @@ public class MailTemplate {
         Map<String, Object> data = new HashMap<>();
         data.put("email", email);
 
+        data.put("rsvp", email.getEvent().findUserOnEvent(email.getSender().getPk()).getResponse());
+
         StringWriter sw = generateBody(
                 email.getEmail().getFreemarkerTemplate(),
                 data);
