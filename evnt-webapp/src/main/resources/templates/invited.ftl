@@ -5,7 +5,7 @@
         </style>
     </head>
     <body>
-        <p>${inviter} has invited you to the event ${event.name}! Click the link below to view and RSVP.</p>
-        http://localhost:8080/#!view-event/?eventPk=${event.pk}
+        <p>${email.sender.displayName} has invited you to the event ${email.event.name}! Click the link below to view and RSVP.</p>
+        http://localhost:8080/#!view-event/?eventPk=${email.event.pk}
     </body>
 </html>

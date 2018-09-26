@@ -10,9 +10,9 @@
     </resultMap>
 
     <sql id="securityRoleSelectCols">
-        securityRole.pk as secRole_pk,
-        securityRole.name as secRole_name,
-        securityRole.is_active as secRole_is_active
+        ${prefix}securityRole.pk as ${prefix}secRole_pk,
+        ${prefix}securityRole.name as ${prefix}secRole_name,
+        ${prefix}securityRole.is_active as ${prefix}secRole_is_active
     </sql>
 
     <sql id="securityRoleTables">
@@ -21,14 +21,18 @@
 
     <select id="findAll" resultMap="securityRoleResultMap">
         select
-            <include refid="securityRoleSelectCols"/>
+            <include refid="securityRoleSelectCols">
+                <property name="prefix" value=""/>
+            </include>
         from
             <include refid="securityRoleTables"/>
     </select>
 
     <select id="findByPk" resultMap="securityRoleResultMap">
         select
-            <include refid="securityRoleSelectCols"/>
+            <include refid="securityRoleSelectCols">
+                <property name="prefix" value=""/>
+            </include>
         from
             <include refid="securityRoleTables"/>
         where

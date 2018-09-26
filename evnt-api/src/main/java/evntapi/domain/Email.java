@@ -9,5 +9,7 @@ public class Email {
     private Integer pk;
     private String name;
     private String description;
+    private String subjectLine;
+    private String freemarkerTemplate;
     private boolean isActive;
 }

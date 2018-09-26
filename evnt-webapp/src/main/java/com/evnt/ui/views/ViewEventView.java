@@ -30,7 +30,7 @@ public class ViewEventView extends AbstractView {
     @Autowired
     private RoleDelegateService roleService;
     @Autowired
-    private MailDelegateService mailService;
+    private QueuedEmailDelegateService queuedEmailService;
     @Autowired
     private UserDelegateService userService;
     @Autowired
@@ -123,7 +123,7 @@ public class ViewEventView extends AbstractView {
     }
 
     private void launchManageInvitesOverlay() {
-        ManageInvitesOverlay manageInvitesOverlay = new ManageInvitesOverlay(event, isHost, userService, eventUserService, roleService, mailService, userAuthService);
+        ManageInvitesOverlay manageInvitesOverlay = new ManageInvitesOverlay(event, isHost, userService, eventUserService, roleService, queuedEmailService, userAuthService);
         manageInvitesOverlay.addCloseListener(close -> {
             invitedLayout.removeAllComponents();
             invitedLayout.addComponent(getInvitedComponent());

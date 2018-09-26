@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="evntapi.rest.mapper.QueuedEmailMapper">
+    <resultMap id="queuedEmailResultMap" type="evntapi.domain.QueuedEmail">
+        <id     property="pk"       column="qe_pk"/>
+        <result property="sendDate" column="qe_send_date"/>
+
+        <association property="email" resultMap="evntapi.rest.mapper.EmailMapper.emailResultMap"/>
+        <association property="recipient" resultMap="evntapi.rest.mapper.UserMapper.userResultMap" columnPrefix="re_"/>
+        <association property="event" resultMap="evntapi.rest.mapper.EventMapper.eventResultMap"/>
+        <association property="sender" resultMap="evntapi.rest.mapper.UserMapper.userResultMap" columnPrefix="se_"/>
+    </resultMap>
+
+    <sql id="queuedEmailSelectCols">
+        qe.pk as qe_pk,
+        qe.send_date as qe_send_date,
+        <include refid="evntapi.rest.mapper.EmailMapper.emailSelectCols"/>,
+        <include refid="evntapi.rest.mapper.UserMapper.userSelectCols">
+            <property name="prefix" value="re_"/>
+        </include>,
+        <include refid="evntapi.rest.mapper.EventMapper.eventSelectCols"/>,
+        <include refid="evntapi.rest.mapper.UserMapper.userSelectCols">
+            <property name="prefix" value="se_"/>
+        </include>
+    </sql>
+
+    <sql id="queuedEmailTables">
+        email_queue qe
+        left join email on (qe.email_fk = email.pk)
+        left join user re_user on (qe.recipient_fk = re_user.pk)
+        left join user_security_role re_usr on (re_usr.user_fk = re_user.pk)
+        left join security_role re_securityRole on (re_securityRole.pk = re_usr.security_role_fk)
+        left join event on (qe.event_fk = event.pk)
+        left join event_user_role_response eurr on (event.pk = eurr.event_fk)
+        left join user eu_user on (eurr.user_fk = eu_user.pk)
+        left join role on (eurr.role_fk = role.pk)
+        left join response on (eurr.response_fk = response.pk)
+        left join user_security_role eu_usr on (eu_usr.user_fk = eu_user.pk)
+        left join security_role eu_securityRole on (eu_securityRole.pk = eu_usr.security_role_fk)
+        left join user se_user on (qe.recipient_fk = se_user.pk)
+        left join user_security_role se_usr on (se_usr.user_fk = se_user.pk)
+        left join security_role se_securityRole on (se_securityRole.pk = se_usr.security_role_fk)
+    </sql>
+
+    <select id="findAll" resultMap="queuedEmailResultMap">
+        select
+            <include refid="queuedEmailSelectCols"/>
+        from
+            <include refid="queuedEmailTables"/>
+    </select>
+
+    <insert id="insert" parameterType="evntapi.domain.QueuedEmail" useGeneratedKeys="true" keyProperty="pk" keyColumn="PK">
+        insert into
+            email_queue(email_fk, recipient_fk, send_date, event_fk, sender_fk)
+        values
+            (#{email.pk},
+            #{recipient.pk},
+            #{sendDate},
+            #{event.pk},
+            #{sender.pk})
+    </insert>
+
+    <delete id="delete">
+        delete from
+            email_queue
+        where
+            pk = #{pk}
+    </delete>
+
+</mapper>

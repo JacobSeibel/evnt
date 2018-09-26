@@ -4,27 +4,31 @@
 
 <mapper namespace="evntapi.rest.mapper.EventUserMapper">
     <resultMap id="eventUserResultMap" type="evntapi.domain.EventUser">
+        <result property="eventFk"      column="eurr_event_fk"/>
         <result property="responseDate" column="eurr_response_date"/>
 
-        <association property="user" resultMap="evntapi.rest.mapper.UserMapper.userResultMap"/>
+        <association property="user" resultMap="evntapi.rest.mapper.UserMapper.userResultMap" columnPrefix="eu_"/>
         <association property="role" resultMap="evntapi.rest.mapper.RoleMapper.roleResultMap"/>
         <association property="response" resultMap="evntapi.rest.mapper.ResponseMapper.responseResultMap"/>
     </resultMap>
 
     <sql id="eventUserSelectCols">
+        eurr.event_fk as eurr_event_fk,
         eurr.response_date as eurr_response_date,
-        <include refid="evntapi.rest.mapper.UserMapper.userSelectCols"/>,
+        <include refid="evntapi.rest.mapper.UserMapper.userSelectCols">
+            <property name="prefix" value="eu_"/>
+        </include>,
         <include refid="evntapi.rest.mapper.RoleMapper.roleSelectCols"/>,
         <include refid="evntapi.rest.mapper.ResponseMapper.responseSelectCols"/>
     </sql>
 
     <sql id="eventUserTables">
         event_user_role_response eurr
-        left join user on (eurr.user_fk = user.pk)
+        left join user eu_user on (eurr.user_fk = eu_user.pk)
         left join role on (eurr.role_fk = role.pk)
         left join response on (eurr.response_fk = response.pk)
-        left join user_security_role usr on (usr.user_fk = user.pk)
-        left join security_role securityRole on (securityRole.pk = usr.security_role_fk)
+        left join user_security_role eu_usr on (eu_usr.user_fk = eu_user.pk)
+        left join security_role eu_securityRole on (eu_securityRole.pk = eu_usr.security_role_fk)
     </sql>
 
     <select id="findByEventFk" resultMap="eventUserResultMap">
@@ -55,7 +59,7 @@
         response_fk = #{response.pk},
         response_date = #{responseDate}
         where
-        event_fk = #{event.pk}
+        event_fk = #{eventFk}
         and
         user_fk = #{user.pk}
     </update>

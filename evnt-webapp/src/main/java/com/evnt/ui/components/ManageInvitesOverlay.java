@@ -1,19 +1,15 @@
 package com.evnt.ui.components;
 
 import com.evnt.domain.*;
+import com.evnt.domain.EventObject;
 import com.evnt.persistence.*;
 import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
-import com.evnt.ui.views.ViewEventView;
-import com.evnt.util.MailTemplate;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.*;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 public class ManageInvitesOverlay extends Window {
@@ -21,7 +17,7 @@ public class ManageInvitesOverlay extends Window {
     private final UserDelegateService userService;
     private final EventUserDelegateService eventUserService;
     private final RoleDelegateService roleService;
-    private final MailDelegateService mailService;
+    private final QueuedEmailDelegateService queuedEmailService;
     private final UserAuthenticationService userAuthService;
 
     private final EventObject event;
@@ -35,14 +31,14 @@ public class ManageInvitesOverlay extends Window {
             UserDelegateService userService,
             EventUserDelegateService eventUserService,
             RoleDelegateService roleService,
-            MailDelegateService mailService,
+            QueuedEmailDelegateService queuedEmailService,
             UserAuthenticationService userAuthService){
         this.event = event;
         this.isHost = isHost;
         this.userService = userService;
         this.eventUserService = eventUserService;
         this.roleService = roleService;
-        this.mailService = mailService;
+        this.queuedEmailService = queuedEmailService;
         this.userAuthService = userAuthService;
         build();
         center();
@@ -189,9 +185,30 @@ public class ManageInvitesOverlay extends Window {
     }
 
     private void notifyUsers(){
+        //Send invites 10 minutes from now
+        Calendar sendDateCalendar = Calendar.getInstance();
+        sendDateCalendar.add(Calendar.MINUTE, 10);
+
+        Email invitation = new Email(Email.INVITATION);
+
         for(EventUser eu : event.getEventUsers()){
             if(!usersAlreadyInvited.contains(eu)){
-                mailService.send(MailTemplate.INSTANCE.getInvitedEmail(eu, userAuthService.loggedInUser().getDisplayName(), event));
+                QueuedEmail email = new QueuedEmail(
+                        invitation,
+                        eu.getUser(),
+                        event,
+                        userAuthService.loggedInUser(),
+                        sendDateCalendar.getTime()
+                );
+
+                queuedEmailService.insert(email);
+            }
+        }
+
+        //Cancel unsent invites for uninvited people
+        for(EventUser eu : usersAlreadyInvited){
+            if(!event.getEventUsers().contains(eu)){
+//                queuedEmailService.delete();
             }
         }
     }

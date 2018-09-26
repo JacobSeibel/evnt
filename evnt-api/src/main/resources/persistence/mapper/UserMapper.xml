@@ -17,16 +17,18 @@
     </resultMap>
 
     <sql id="userSelectCols">
-        user.pk as user_pk,
-        user.username as user_username,
-        user.email as user_email,
-        user.password as user_password,
-        user.cell_number as user_cell_number,
-        user.is_active as user_is_active,
-        user.first_name as user_first_name,
-        user.last_name as user_last_name,
+        ${prefix}user.pk as ${prefix}user_pk,
+        ${prefix}user.username as ${prefix}user_username,
+        ${prefix}user.email as ${prefix}user_email,
+        ${prefix}user.password as ${prefix}user_password,
+        ${prefix}user.cell_number as ${prefix}user_cell_number,
+        ${prefix}user.is_active as ${prefix}user_is_active,
+        ${prefix}user.first_name as ${prefix}user_first_name,
+        ${prefix}user.last_name as ${prefix}user_last_name,
 
-        <include refid="evntapi.rest.mapper.SecurityRoleMapper.securityRoleSelectCols"/>
+        <include refid="evntapi.rest.mapper.SecurityRoleMapper.securityRoleSelectCols">
+            <property name="prefix" value="${prefix}"/>
+        </include>
     </sql>
 
     <sql id="userTables">
@@ -37,14 +39,18 @@
 
     <select id="findAll" resultMap="userResultMap">
         select
-            <include refid="userSelectCols"/>
+            <include refid="userSelectCols">
+                <property name="prefix" value=""/>
+            </include>
         from
             <include refid="userTables"/>
     </select>
 
     <select id="findActive" resultMap="userResultMap">
         select
-            <include refid="userSelectCols"/>
+            <include refid="userSelectCols">
+                <property name="prefix" value=""/>
+            </include>
         from
             <include refid="userTables"/>
         where
@@ -53,7 +59,9 @@
 
     <select id="findByUsername" resultMap="userResultMap">
         select
-            <include refid="userSelectCols"/>
+            <include refid="userSelectCols">
+                <property name="prefix" value=""/>
+            </include>
         from
             <include refid="userTables"/>
         where
@@ -64,7 +72,9 @@
 
     <select id="findByEmail" resultMap="userResultMap">
         select
-            <include refid="userSelectCols"/>
+            <include refid="userSelectCols">
+                <property name="prefix" value=""/>
+            </include>
         from
             <include refid="userTables"/>
         where

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+
+    <property resource="application.properties"/>
+
+    <contextName>seqmaster-api</contextName>
+
+    <!-- This is console appender definition -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- log by method is not fast. remove it later -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}/%method %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <root level="DEBUG">          <!-- Development version of the logging-->
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+
+    <logger name="com.basf.gb.cube.seq" level="DEBUG"/>
+
+    <logger name="java.sql" level="DEBUG"/>
+    <logger name="java.sql.ResultSet" level="WARN"/>
+
+    <logger name="org.mybatis.sqlmap" level="DEBUG"/>
+    <logger name="org.apache.ibatis" level="WARN"/>
+
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.springframework.security" level="DEBUG"/>
+    <logger name="org.springframework.boot.autoconfigure.security" level="DEBUG"/>
+
+    <logger name="org.vaadin.spring" level="DEBUG"/>
+    <logger name="com.vaadin.spring" level="DEBUG"/>
+
+    <logger name="ru.xpoft" level="DEBUG"/>
+
+</configuration>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="evntapi.rest.mapper.EmailMapper">
+    <resultMap id="emailResultMap" type="evntapi.domain.Email">
+        <id     property="pk"                 column="email_pk"/>
+        <result property="name"               column="email_name"/>
+        <result property="description"        column="email_description"/>
+        <result property="subjectLine"        column="email_subject_line"/>
+        <result property="freemarkerTemplate" column="email_freemarker_template"/>
+        <result property="isActive"           column="email_is_active"/>
+    </resultMap>
+
+    <sql id="emailSelectCols">
+        email.pk as email_pk,
+        email.name as email_name,
+        email.description as email_description,
+        email.subject_line as email_subject_line,
+        email.freemarker_template as email_freemarker_template,
+        email.is_active as email_is_active
+    </sql>
+
+    <sql id="emailTables">
+        email
+    </sql>
+
+    <select id="findAll" resultMap="emailResultMap">
+        select
+            <include refid="emailSelectCols"/>
+        from
+            <include refid="emailTables"/>
+    </select>
+
+    <select id="findByPk" resultMap="emailResultMap">
+        select
+            <include refid="emailSelectCols"/>
+        from
+            <include refid="emailTables"/>
+        where
+            email.pk = #{pk}
+    </select>
+</mapper>
