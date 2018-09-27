@@ -185,9 +185,17 @@ public class ManageInvitesOverlay extends Window {
     }
 
     private void notifyUsers(){
-        //Send invites 10 minutes from now
-        Calendar sendDateCalendar = Calendar.getInstance();
-        sendDateCalendar.add(Calendar.MINUTE, 10);
+        Calendar tenMinutesFromNow = Calendar.getInstance();
+        tenMinutesFromNow.add(Calendar.MINUTE, 10);
+        Calendar twentyFourHoursPrior = Calendar.getInstance();
+        twentyFourHoursPrior.setTime(event.getStartDate());
+        twentyFourHoursPrior.add(Calendar.HOUR, -24);
+        Calendar rsvpDeadline = twentyFourHoursPrior;
+        if(event.getRsvpDate() != null) {
+            rsvpDeadline = Calendar.getInstance();
+            rsvpDeadline.setTime(event.getRsvpDate());
+            rsvpDeadline.add(Calendar.HOUR, -24);
+        }
 
         Email invitation = new Email(Email.INVITATION);
         Email eventIsSoon = new Email(Email.EVENT_IS_SOON);
@@ -200,21 +208,21 @@ public class ManageInvitesOverlay extends Window {
                         eu.getUser(),
                         event,
                         userAuthService.loggedInUser(),
-                        sendDateCalendar.getTime()
+                        tenMinutesFromNow.getTime()
                 );
                 QueuedEmail eventIsSoonEmail = new QueuedEmail(
                         eventIsSoon,
                         eu.getUser(),
                         event,
                         userAuthService.loggedInUser(),
-                        sendDateCalendar.getTime()
+                        twentyFourHoursPrior.getTime()
                 );
                 QueuedEmail rsvpReminderEmail = new QueuedEmail(
                         rsvpReminder,
                         eu.getUser(),
                         event,
                         userAuthService.loggedInUser(),
-                        sendDateCalendar.getTime()
+                        rsvpDeadline.getTime()
                 );
 
 
