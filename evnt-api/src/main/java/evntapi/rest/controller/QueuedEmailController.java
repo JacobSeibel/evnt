@@ -29,9 +29,15 @@ public class QueuedEmailController {
         return queuedEmailService.insert(queuedEmail);
     }
 
-    @DeleteMapping("{pk}")
+    @DeleteMapping("/emailFk/{emailFk}/recipientFk/{recipientFk}/eventFk/{eventFk}")
     @ResponseStatus(HttpStatus.OK)
-    public void delete(@PathVariable("pk") int pk){
-        queuedEmailService.delete(pk);
+    public void delete(@PathVariable("emailFk") int emailFk, @PathVariable("recipientFk") int recipientFk, @PathVariable("eventFk") int eventFk){
+        queuedEmailService.delete(emailFk, recipientFk, eventFk);
+    }
+
+    @DeleteMapping("/recipientFk/{recipientFk}/eventFk/{eventFk}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteByRecipientAndEvent(@PathVariable("recipientFk") int recipientFk, @PathVariable("eventFk") int eventFk){
+        queuedEmailService.deleteByRecipientAndEvent(recipientFk, eventFk);
     }
 }

@@ -48,10 +48,19 @@ public class QueuedEmailDelegateService {
     /*
     ##### DELETE #####
      */
-    public void delete(int pk){
+    public void delete(int emailFk, int recipientFk, int eventFk){
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.exchange(
-                URL + pk,
+                URL + "emailFk/"+emailFk+"/recipientFk/"+recipientFk+"/eventFk/"+eventFk,
+                HttpMethod.DELETE,
+                null,
+                new ParameterizedTypeReference<QueuedEmail>(){});
+    }
+
+    public void deleteByRecipientAndEvent(int recipientFk, int eventFk){
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.exchange(
+                URL + "recipientFk/"+recipientFk+"/eventFk/"+eventFk,
                 HttpMethod.DELETE,
                 null,
                 new ParameterizedTypeReference<QueuedEmail>(){});

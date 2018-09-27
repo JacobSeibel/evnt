@@ -26,7 +26,12 @@ public class QueuedEmailServiceImpl implements QueuedEmailService{
     }
 
     @Override
-    public void delete(int pk) {
-        mapper.delete(pk);
+    public void delete(int emailFk, int recipientFk, int eventFk) {
+        mapper.delete(emailFk, recipientFk, eventFk);
+    }
+
+    @Override
+    public void deleteByRecipientAndEvent(int recipientFk, int eventFk) {
+        mapper.deleteByRecipientAndEvent(recipientFk, eventFk);
     }
 }

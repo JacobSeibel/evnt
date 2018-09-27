@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(RestConstants.MAIL_API)
 public class MailController {
 
-    private static final String DEFAULT_FROM = "evnt@donotreply.com";
+    private static final String DEFAULT_FROM = "jacobaseibel@gmail.com";
 
     @Autowired
     private MailService mailService;

@@ -37,7 +37,7 @@ public class ScheduledTasks {
         log.debug("Found {} emails ready for sending.", toSend.size());
         for(QueuedEmail sendEmail : toSend){
             mailService.send(MailTemplate.INSTANCE.getEmail(sendEmail));
-            queuedEmailService.delete(sendEmail.getPk());
+            queuedEmailService.delete(sendEmail.getEmail().getPk(), sendEmail.getRecipient().getPk(), sendEmail.getEvent().getPk());
         }
     }
 }

@@ -9,5 +9,6 @@ import java.util.List;
 public interface QueuedEmailService {
     List<QueuedEmail> findAll();
     QueuedEmail insert(QueuedEmail queuedEmail);
-    void delete(int pk);
+    void delete(int emailFk, int recipientFk, int eventFk);
+    void deleteByRecipientAndEvent(int recipientFk, int eventFk);
 }

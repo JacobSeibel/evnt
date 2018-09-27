@@ -171,6 +171,7 @@ public class CreateEventView extends AbstractView implements View {
                 .bind(EventObject::isAllowMaybes, EventObject::setAllowMaybes);
         DateField rsvpDeadlineDate = new DateField("RSVP Deadline");
         binder.forField(rsvpDeadlineDate)
+                .withValidator(rsvpDate -> rsvpDate == null || rsvpDate.isBefore(startTimeField.getValue().toLocalDate()), "RSVP Deadline must be before Start Time!")
                 .withConverter(new LocalDateToDateConverter(ZoneId.systemDefault()))
                 .bind(EventObject::getRsvpDate, EventObject::setRsvpDate);
 

@@ -1,4 +1,4 @@
-package mailapi.rest.controller;
+package mailapi.rest.service;
 
 import lombok.extern.slf4j.Slf4j;
 import mailapi.domain.MailParams;

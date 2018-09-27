@@ -4,7 +4,6 @@
 
 <mapper namespace="evntapi.rest.mapper.QueuedEmailMapper">
     <resultMap id="queuedEmailResultMap" type="evntapi.domain.QueuedEmail">
-        <id     property="pk"       column="qe_pk"/>
         <result property="sendDate" column="qe_send_date"/>
 
         <association property="email" resultMap="evntapi.rest.mapper.EmailMapper.emailResultMap"/>
@@ -14,7 +13,6 @@
     </resultMap>
 
     <sql id="queuedEmailSelectCols">
-        qe.pk as qe_pk,
         qe.send_date as qe_send_date,
         <include refid="evntapi.rest.mapper.EmailMapper.emailSelectCols"/>,
         <include refid="evntapi.rest.mapper.UserMapper.userSelectCols">
@@ -39,7 +37,7 @@
         left join response on (eurr.response_fk = response.pk)
         left join user_security_role eu_usr on (eu_usr.user_fk = eu_user.pk)
         left join security_role eu_securityRole on (eu_securityRole.pk = eu_usr.security_role_fk)
-        left join user se_user on (qe.recipient_fk = se_user.pk)
+        left join user se_user on (qe.sender_fk = se_user.pk)
         left join user_security_role se_usr on (se_usr.user_fk = se_user.pk)
         left join security_role se_securityRole on (se_securityRole.pk = se_usr.security_role_fk)
     </sql>
@@ -51,7 +49,7 @@
             <include refid="queuedEmailTables"/>
     </select>
 
-    <insert id="insert" parameterType="evntapi.domain.QueuedEmail" useGeneratedKeys="true" keyProperty="pk" keyColumn="PK">
+    <insert id="insert" parameterType="evntapi.domain.QueuedEmail">
         insert into
             email_queue(email_fk, recipient_fk, send_date, event_fk, sender_fk)
         values
@@ -66,7 +64,20 @@
         delete from
             email_queue
         where
-            pk = #{pk}
+            email_fk = #{emailFk}
+        and
+            recipient_fk = #{recipientFk}
+        and
+            event_fk = #{eventFk}
+    </delete>
+
+    <delete id="deleteByRecipientAndEvent">
+        delete from
+            email_queue
+        where
+            recipient_fk = #{recipientFk}
+        and
+            event_fk = #{eventFk}
     </delete>
 
 </mapper>

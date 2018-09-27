@@ -184,33 +184,50 @@ public class ManageInvitesOverlay extends Window {
                         click -> {}));
     }
 
-    //TODO: Add Event Is Soon emails and RSVP Reminder email
     private void notifyUsers(){
         //Send invites 10 minutes from now
         Calendar sendDateCalendar = Calendar.getInstance();
         sendDateCalendar.add(Calendar.MINUTE, 10);
 
         Email invitation = new Email(Email.INVITATION);
+        Email eventIsSoon = new Email(Email.EVENT_IS_SOON);
+        Email rsvpReminder = new Email(Email.RSVP_REMINDER);
 
         for(EventUser eu : event.getEventUsers()){
             if(!usersAlreadyInvited.contains(eu)){
-                QueuedEmail email = new QueuedEmail(
+                QueuedEmail invitationEmail = new QueuedEmail(
                         invitation,
                         eu.getUser(),
                         event,
                         userAuthService.loggedInUser(),
                         sendDateCalendar.getTime()
                 );
+                QueuedEmail eventIsSoonEmail = new QueuedEmail(
+                        eventIsSoon,
+                        eu.getUser(),
+                        event,
+                        userAuthService.loggedInUser(),
+                        sendDateCalendar.getTime()
+                );
+                QueuedEmail rsvpReminderEmail = new QueuedEmail(
+                        rsvpReminder,
+                        eu.getUser(),
+                        event,
+                        userAuthService.loggedInUser(),
+                        sendDateCalendar.getTime()
+                );
 
-                queuedEmailService.insert(email);
+
+                queuedEmailService.insert(invitationEmail);
+                queuedEmailService.insert(eventIsSoonEmail);
+                queuedEmailService.insert(rsvpReminderEmail);
             }
         }
 
-        //Cancel unsent invites for uninvited people
+        //Cancel unsent emails for uninvited people
         for(EventUser eu : usersAlreadyInvited){
             if(!event.getEventUsers().contains(eu)){
-                //TODO: Make this work
-//                queuedEmailService.delete();
+                queuedEmailService.deleteByRecipientAndEvent(eu.getUser().getPk(), event.getPk());
             }
         }
     }

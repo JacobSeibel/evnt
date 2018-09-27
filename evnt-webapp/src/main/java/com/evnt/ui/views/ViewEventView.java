@@ -139,7 +139,7 @@ public class ViewEventView extends AbstractView {
         //Send response 10 minutes from now
         Calendar sendDateCalendar = Calendar.getInstance();
         sendDateCalendar.add(Calendar.MINUTE, 10);
-        Email email = new Email(Email.EVENT_UPDATED);
+        Email email = new Email(Email.RSVP_REMINDER);
 
         for(User host : event.getHosts()){
             QueuedEmail qe = new QueuedEmail(
@@ -156,7 +156,9 @@ public class ViewEventView extends AbstractView {
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent changeEvent) {
         Integer eventPk = ParamUtils.getIntegerParam("eventPk");
-        this.event = eventService.findByPk(eventPk);
+        if(eventPk != null) {
+            this.event = eventService.findByPk(eventPk);
+        }
 
         build();
     }
