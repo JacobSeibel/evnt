@@ -3,12 +3,19 @@
 @mixin evntwebapp {
 	@include valo;
 
-	.v-panel-content-no-scroll {
-	    overflow: hidden;
-	}
+    .v-slot-navbar{
+        background-color: #FFC0BE;
+        padding: 10px;
+        box-shadow: 0px 0px 10px #AA6666;
+        border-radius: 10px;
+    }
 
-	.v-panel-content-repositionable:hover{
-    	opacity: .8;
-    	cursor: pointer;
+    .v-verticallayout-login-box{
+        background-color: rgba(100, 100, 100, .3);
+        border-radius: 10px;
+    }
+
+    .v-panel{
+        @include linear-gradient(#FFF0F0, white);
     }
 }

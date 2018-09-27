@@ -5,11 +5,9 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Label;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringView(name = ErrorView.NAME)
 public class ErrorView extends AbstractView {
-
     public final static String NAME = "error";
 
     private String errorMessage;

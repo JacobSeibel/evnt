@@ -1,6 +1,7 @@
 package com.evnt.ui.views;
 
 import com.evnt.ui.EvntWebappUI;
+import com.evnt.ui.Theme;
 import com.evnt.ui.components.LogoutLink;
 import com.evnt.ui.events.LogoutEvent;
 import com.evnt.ui.events.UserLoggedInEvent;
@@ -21,12 +22,11 @@ public abstract class AbstractView extends Panel implements View {
     AbstractView() {
         setSizeFull();
         layout = new VerticalLayout();
-        layout.setMargin(true);
-        layout.setSpacing(true);
 
         buildNavbar();
 
         setContent(layout);
+
 
         registerWithEventbus();
     }
@@ -34,10 +34,9 @@ public abstract class AbstractView extends Panel implements View {
     private void buildNavbar(){
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setSpacing(true);
-        final Link homeLink = new Link("Home", new ExternalResource("#!" + MainView.NAME));
-        homeLink.setIcon(VaadinIcons.HOME);
+        final Link homeLink = new Link("evnt", new ExternalResource("#!" + MainView.NAME));
         horizontalLayout.addComponent(homeLink);
-        final Link profileLink = new Link("Your Profile", new ExternalResource("#!" + ProfileView.NAME));
+        final Link profileLink = new Link("Profile", new ExternalResource("#!" + ProfileView.NAME));
         profileLink.setIcon(VaadinIcons.USER);
         horizontalLayout.addComponent(profileLink);
         final Link invalidLink = new Link("Create Event", new ExternalResource("#!" + CreateEventView.NAME));
@@ -48,13 +47,7 @@ public abstract class AbstractView extends Panel implements View {
         logoutLink.updateVisibility();
         horizontalLayout.addComponent(logoutLink);
 
-//        Link adminLink = new Link("Admin page", new ExternalResource("#!" + AdminView.NAME));
-//        adminLink.setIcon(VaadinIcons.LOCK);
-//        horizontalLayout.addComponent(adminLink);
-
-//        Link aboutLink = new Link("About", new ExternalResource("#!" + AboutView.NAME));
-//        aboutLink.setIcon(VaadinIcons.QUESTION_CIRCLE);
-//        horizontalLayout.addComponent(aboutLink);
+        horizontalLayout.addStyleName(Theme.NAVBAR);
 
         addComponent(horizontalLayout);
     }

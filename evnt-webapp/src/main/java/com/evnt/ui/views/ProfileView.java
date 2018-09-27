@@ -1,5 +1,6 @@
 package com.evnt.ui.views;
 
+import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
 import com.evnt.ui.components.GoToMainViewLink;
 import com.evnt.ui.components.LogoutLink;
@@ -19,6 +20,9 @@ import javax.annotation.PostConstruct;
 @Secured("ROLE_USER")
 @SpringView(name = ProfileView.NAME)
 public class ProfileView extends AbstractView {
+
+    @Autowired
+    UserAuthenticationService userAuthenticationService;
 
     private Logger LOG = LoggerFactory.getLogger(ProfileView.class);
 

@@ -70,6 +70,19 @@
             event.is_active = 1
     </select>
 
+    <select id="findFutureByUserFk" resultMap="eventResultMap">
+        select
+            <include refid="eventSelectCols"/>
+        from
+            <include refid="eventTables"/>
+        where
+            #{userFk} in (select eventUser.user_fk from event_user_role_response eventUser where eventUser.event_fk = event.pk)
+        and
+            event.is_active = 1
+        and
+            event.start_date >= sysdate()
+    </select>
+
     <insert id="insert" parameterType="evntapi.domain.Event" useGeneratedKeys="true" keyProperty="pk" keyColumn="PK">
         insert into
             event(pk, name, location, start_date, end_date, description, allow_maybes, rsvp_date, event_photo, is_active)

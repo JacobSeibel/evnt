@@ -2,7 +2,7 @@ package com.evnt.ui.views;
 
 import com.evnt.spring.security.UserAuthenticationService;
 import com.evnt.ui.EvntWebappUI;
-import com.evnt.ui.components.GoToMainViewLink;
+import com.evnt.ui.Theme;
 import com.evnt.ui.events.NavigationEvent;
 import com.google.common.eventbus.EventBus;
 import com.vaadin.event.ShortcutAction;
@@ -18,27 +18,28 @@ import org.springframework.security.core.Authentication;
 @SpringView(name = LoginView.NAME)
 public class LoginView extends AbstractView {
 
-    public final static String NAME = "login";
-
     @Autowired
     private UserAuthenticationService userAuthenticationService;
+
+    public final static String NAME = "login";
 
     private String forwardTo;
     private TextField nameTF;
     private PasswordField passwordTF;
 
     public LoginView() {
-        addComponent(new Label(
+        VerticalLayout loginLayout = new VerticalLayout();
+        loginLayout.addComponent(new Label(
                 "Please enter your credentials:"));
-        nameTF = new TextField();
+        nameTF = new TextField("Username");
         nameTF.setRequiredIndicatorVisible(true);
         nameTF.focus();
 
-        passwordTF = new PasswordField();
+        passwordTF = new PasswordField("Password");
         passwordTF.setRequiredIndicatorVisible(true);
 
-        addComponent(nameTF);
-        addComponent(passwordTF);
+        loginLayout.addComponent(nameTF);
+        loginLayout.addComponent(passwordTF);
 
         Button loginButton = new Button("Login");
         loginButton.setClickShortcut(ShortcutAction.KeyCode.ENTER);
@@ -61,12 +62,19 @@ public class LoginView extends AbstractView {
             }
         });
         loginButton.setIcon(VaadinIcons.SIGN_IN);
-        addComponent(loginButton);
+        loginLayout.addComponent(loginButton);
 
         Link signUpLink = new Link("Don't have an account? Sign up now!", new ExternalResource("#!" + CreateAccountView.NAME));
-        addComponent(signUpLink);
+        loginLayout.addComponent(signUpLink);
 
-        addComponent(new GoToMainViewLink());
+        loginLayout.addStyleName(Theme.LOGIN_BOX);
+        loginLayout.setWidth("400px");
+        loginLayout.setHeight("400px");
+        VerticalLayout rootLayout = new VerticalLayout(loginLayout);
+        rootLayout.setComponentAlignment(loginLayout, Alignment.MIDDLE_CENTER);
+
+        addComponent(rootLayout);
+
     }
 
     @Override

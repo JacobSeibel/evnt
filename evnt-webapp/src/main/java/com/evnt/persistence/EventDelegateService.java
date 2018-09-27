@@ -63,6 +63,17 @@ public class EventDelegateService{
         return response.getBody();
     }
 
+    public List<EventObject> findFutureByUserFk(int userFk){
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<List<EventObject>> response =
+                restTemplate.exchange(
+                        URL+"future/userFk/"+userFk,
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<List<EventObject>>(){});
+        return response.getBody();
+    }
+
     /*
     ##### POST #####
      */

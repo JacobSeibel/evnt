@@ -24,11 +24,11 @@ public class CreateAccountView extends AbstractView {
     public final static String NAME = "create-account";
 
     @Autowired
-    private UserAuthenticationService userAuthenticationService;
-    @Autowired
     private UserDelegateService userService;
     @Autowired
     private SecurityRoleDelegateService securityService;
+    @Autowired
+    private UserAuthenticationService userAuthenticationService;
 
     private String forwardTo;
 

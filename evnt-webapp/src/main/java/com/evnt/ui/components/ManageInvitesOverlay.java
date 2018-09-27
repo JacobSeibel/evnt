@@ -44,8 +44,8 @@ public class ManageInvitesOverlay extends Window {
         center();
         setClosable(true);
         setModal(true);
-        setHeight("60%");
-        setWidth("40%");
+        setHeight("65%");
+        setWidth("50%");
 
         addCloseListener(close -> notifyUsers());
     }

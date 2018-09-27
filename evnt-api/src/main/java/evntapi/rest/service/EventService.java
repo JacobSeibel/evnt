@@ -13,6 +13,7 @@ public interface EventService {
     List<Event> findAll();
     Event findByPk(int pk);
     List<Event> findByUserFk(int userFk);
+    List<Event> findFutureByUserFk(int userFk);
     Event insert(Event event, int creatorFk);
     Event update(Event event);
 }

@@ -33,6 +33,11 @@ public class EventServiceImpl implements EventService{
     }
 
     @Override
+    public List<Event> findFutureByUserFk(int userFk) {
+        return mapper.findFutureByUserFk(userFk);
+    }
+
+    @Override
     @Transactional
     public Event insert(Event event, int creatorFk) {
         mapper.insert(event);

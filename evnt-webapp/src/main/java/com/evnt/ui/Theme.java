@@ -1,6 +1,6 @@
 package com.evnt.ui;
 
 public class Theme {
-    public static final String REPOSITIONABLE = "repositionable";
-    public static final String NO_SCROLL = "no-scroll";
+    public static final String NAVBAR = "navbar";
+    public static final String LOGIN_BOX = "login-box";
 }

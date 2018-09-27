@@ -38,16 +38,16 @@ public class CreateEventView extends AbstractView implements View {
     @Autowired
     private EventDelegateService eventService;
     @Autowired
-    private UserAuthenticationService userAuthService;
-    @Autowired
     private QueuedEmailDelegateService queuedEmailService;
+    @Autowired
+    private UserAuthenticationService userAuthenticationService;
 
     private EventObject eventObject;
     private boolean isEdit;
 
     private void build() {
         if(eventObject.getPk() != null) {
-            EventUser thisUserOnEvent = eventObject.findUserOnEvent(userAuthService.loggedInUser().getPk());
+            EventUser thisUserOnEvent = eventObject.findUserOnEvent(userAuthenticationService.loggedInUser().getPk());
             if (thisUserOnEvent == null || !(Role.isCreator(thisUserOnEvent.getRole()) || Role.isHost(thisUserOnEvent.getRole()))) {
                 EvntWebappUI.getUiService().postNavigationEvent(this, AccessDeniedView.NAME);
                 return;
@@ -162,6 +162,8 @@ public class CreateEventView extends AbstractView implements View {
                 .withConverter(new LocalDateTimeToDateConverter(ZoneId.systemDefault()))
                 .bind(EventObject::getEndDate, EventObject::setEndDate);
         RichTextArea descriptionRichTextArea = new RichTextArea("Description");
+        descriptionRichTextArea.setHeight("40em");
+        descriptionRichTextArea.setWidth("100%");
         descriptionRichTextArea.focus();
         binder.forField(descriptionRichTextArea)
                 .bind(EventObject::getDescription, EventObject::setDescription);
@@ -231,7 +233,7 @@ public class CreateEventView extends AbstractView implements View {
                     email,
                     eu.getUser(),
                     eventObject,
-                    userAuthService.loggedInUser(),
+                    userAuthenticationService.loggedInUser(),
                     sendDateCalendar.getTime());
 
             queuedEmailService.insert(qe);

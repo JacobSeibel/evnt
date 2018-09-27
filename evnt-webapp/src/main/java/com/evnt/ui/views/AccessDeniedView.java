@@ -7,7 +7,6 @@ import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringView(name = AccessDeniedView.NAME)
 public class AccessDeniedView extends AbstractView  {
@@ -25,5 +24,4 @@ public class AccessDeniedView extends AbstractView  {
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
     }
-
 }

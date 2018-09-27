@@ -10,6 +10,7 @@ import com.evnt.util.ParamUtils;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.StreamResource;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,6 @@ import java.util.Calendar;
 public class ViewEventView extends AbstractView {
 
     @Autowired
-    private UserAuthenticationService userAuthService;
-    @Autowired
     private EventDelegateService eventService;
     @Autowired
     private EventUserDelegateService eventUserService;
@@ -36,6 +35,8 @@ public class ViewEventView extends AbstractView {
     private UserDelegateService userService;
     @Autowired
     private ResponseDelegateService responseService;
+    @Autowired
+    private UserAuthenticationService userAuthenticationService;
 
     public final static String NAME = "view-event";
 
@@ -46,7 +47,7 @@ public class ViewEventView extends AbstractView {
 
     @SuppressWarnings("unchecked")
     private void build(){
-        thisUserOnEvent = event.findUserOnEvent(userAuthService.loggedInUser().getPk());
+        thisUserOnEvent = event.findUserOnEvent(userAuthenticationService.loggedInUser().getPk());
         if(thisUserOnEvent == null){
             EvntWebappUI.getUiService().postNavigationEvent(this, AccessDeniedView.NAME);
             return;
@@ -80,7 +81,7 @@ public class ViewEventView extends AbstractView {
             addComponent(editBtn);
         }
 
-        Label eventTitleLabel = new Label(event.getName());
+        Label eventTitleLabel = new Label("<h1>"+event.getName()+"</h1>", ContentMode.HTML);
 
         Image eventPhotoImage = new Image();
         if(event.getEventPhoto() != null) {
@@ -97,6 +98,7 @@ public class ViewEventView extends AbstractView {
         RichTextArea descriptionRichTextArea = new RichTextArea("Description");
         descriptionRichTextArea.setValue(event.getDescription());
         descriptionRichTextArea.setReadOnly(true);
+        descriptionRichTextArea.setSizeFull();
 
         addComponent(eventTitleLabel);
         addComponent(eventPhotoImage);
@@ -124,7 +126,7 @@ public class ViewEventView extends AbstractView {
     }
 
     private void launchManageInvitesOverlay() {
-        ManageInvitesOverlay manageInvitesOverlay = new ManageInvitesOverlay(event, isHost, userService, eventUserService, roleService, queuedEmailService, userAuthService);
+        ManageInvitesOverlay manageInvitesOverlay = new ManageInvitesOverlay(event, isHost, userService, eventUserService, roleService, queuedEmailService, userAuthenticationService);
         manageInvitesOverlay.addCloseListener(close -> {
             invitedLayout.removeAllComponents();
             invitedLayout.addComponent(getInvitedComponent());
@@ -146,7 +148,7 @@ public class ViewEventView extends AbstractView {
                     email,
                     host,
                     event,
-                    userAuthService.loggedInUser(),
+                    userAuthenticationService.loggedInUser(),
                     sendDateCalendar.getTime());
 
             queuedEmailService.insert(qe);

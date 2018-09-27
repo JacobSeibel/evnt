@@ -37,6 +37,12 @@ public class EventController {
         return eventService.findByUserFk(userFk);
     }
 
+    @GetMapping("/future/userFk/{userFk}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Event> findFutureByUserFk(@PathVariable("userFk") int userFk){
+        return eventService.findFutureByUserFk(userFk);
+    }
+
     @PostMapping("/{creatorFk}")
     @ResponseStatus(HttpStatus.CREATED)
     public Event insert(@PathVariable("creatorFk") int creatorFk, @RequestBody Event event){
