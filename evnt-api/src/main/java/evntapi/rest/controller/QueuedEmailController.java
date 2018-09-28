@@ -26,7 +26,7 @@ public class QueuedEmailController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public QueuedEmail insert(@RequestBody QueuedEmail queuedEmail){
-        return queuedEmailService.insert(queuedEmail);
+        return queuedEmailService.find(queuedEmail.getEmail().getPk(), queuedEmail.getRecipient().getPk(), queuedEmail.getEvent().getPk()) == null ? queuedEmailService.insert(queuedEmail) : queuedEmail;
     }
 
     @DeleteMapping("/emailFk/{emailFk}/recipientFk/{recipientFk}/eventFk/{eventFk}")

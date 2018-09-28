@@ -49,6 +49,19 @@
             <include refid="queuedEmailTables"/>
     </select>
 
+    <select id="find" resultMap="queuedEmailResultMap">
+        select
+            <include refid="queuedEmailSelectCols"/>
+        from
+            <include refid="queuedEmailTables"/>
+        where
+            qe.email_fk = #{emailFk}
+        and
+            qe.recipient_fk = #{recipientFk}
+        and
+            qe.event_fk = #{eventFk}
+    </select>
+
     <insert id="insert" parameterType="evntapi.domain.QueuedEmail">
         insert into
             email_queue(email_fk, recipient_fk, send_date, event_fk, sender_fk)

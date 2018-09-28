@@ -20,6 +20,11 @@ public class QueuedEmailServiceImpl implements QueuedEmailService{
     }
 
     @Override
+    public QueuedEmail find(int emailFk, int recipientFk, int eventFk) {
+        return mapper.find(emailFk, recipientFk, eventFk);
+    }
+
+    @Override
     public QueuedEmail insert(QueuedEmail queuedEmail) {
         mapper.insert(queuedEmail);
         return queuedEmail;

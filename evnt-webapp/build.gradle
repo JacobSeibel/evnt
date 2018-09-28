@@ -31,6 +31,11 @@ lombok {
     sha256 = ""
 }
 
+bootJar {
+    baseName = 'evnt-webapp'
+    version =  '0.1.0'
+}
+
 repositories {
     mavenCentral()
 }
