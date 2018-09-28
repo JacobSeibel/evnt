@@ -4,7 +4,10 @@
 
 <mapper namespace="evntapi.rest.mapper.QueuedEmailMapper">
     <resultMap id="queuedEmailResultMap" type="evntapi.domain.QueuedEmail">
-        <result property="sendDate" column="qe_send_date"/>
+        <id     property="emailFk"     column="qe_email_fk"/>
+        <id     property="recipientFk" column="qe_recipient_fk"/>
+        <id     property="eventFk"     column="qe_event_fk"/>
+        <result property="sendDate"    column="qe_send_date"/>
 
         <association property="email" resultMap="evntapi.rest.mapper.EmailMapper.emailResultMap"/>
         <association property="recipient" resultMap="evntapi.rest.mapper.UserMapper.userResultMap" columnPrefix="re_"/>
@@ -13,6 +16,9 @@
     </resultMap>
 
     <sql id="queuedEmailSelectCols">
+        qe.email_fk as qe_email_fk,
+        qe.recipient_fk as qe_recipient_fk,
+        qe.event_fk as qe_event_fk,
         qe.send_date as qe_send_date,
         <include refid="evntapi.rest.mapper.EmailMapper.emailSelectCols"/>,
         <include refid="evntapi.rest.mapper.UserMapper.userSelectCols">

@@ -15051,9 +15051,9 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .EvntWebapp .v-slot-navbar {
-	background-color: #FFCC00;
+	background-color: #FFB96B;
 	padding: 10px;
-	box-shadow: 0px 0px 10px #885500;
+	box-shadow: 0px 0px 10px #724700;
 	border-radius: 10px;
 }
 
@@ -15063,7 +15063,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .EvntWebapp .v-panel {
-	background-color: #AADDFF;
-	background-image: -webkit-linear-gradient(#AADDFF, white);
-	background-image: linear-gradient(#AADDFF, white);
+	background-color: #CFECFF;
+	background-image: -webkit-linear-gradient(#CFECFF, white);
+	background-image: linear-gradient(#CFECFF, white);
 }

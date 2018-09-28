@@ -8,7 +8,10 @@ import java.util.Date;
 
 @Getter @Setter @ToString
 public class QueuedEmail {
-    private int pk;
+    private int emailFk;
+    private int recipientFk;
+    private int eventFk;
+
     private Email email;
     private User recipient;
     private Event event;
