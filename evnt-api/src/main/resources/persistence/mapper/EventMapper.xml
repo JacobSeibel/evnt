@@ -36,8 +36,8 @@
     <sql id="eventTables">
         event
         left join event_user_role_response eurr on (event.pk = eurr.event_fk)
-        left join user eu_user on (eurr.user_fk = eu_user.pk)
-        left join role on (eurr.role_fk = role.pk)
+        left join user eu_user on (eu_user.pk = eurr.user_fk)
+        left join role on (role.pk = eurr.role_fk)
         left join response on (eurr.response_fk = response.pk)
         left join user_security_role eu_usr on (eu_usr.user_fk = eu_user.pk)
         left join security_role eu_securityRole on (eu_securityRole.pk = eu_usr.security_role_fk)

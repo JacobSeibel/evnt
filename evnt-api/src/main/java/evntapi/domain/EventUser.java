@@ -11,6 +11,7 @@ import java.util.Date;
 @ToString
 public class EventUser {
     private int eventFk;
+    private int userFk;
     private User user;
     private Role role;
     private Response response;

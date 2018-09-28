@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class DateUtils {
     public static String getPresentableDate(Date date){
-        DateFormat df = new SimpleDateFormat("EEEEE, MMMM d y");
+        DateFormat df = new SimpleDateFormat("hh:mm a EEEEE, MMMM d y");
 
         return df.format(date);
     }

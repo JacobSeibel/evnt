@@ -4,7 +4,8 @@
 
 <mapper namespace="evntapi.rest.mapper.EventUserMapper">
     <resultMap id="eventUserResultMap" type="evntapi.domain.EventUser">
-        <result property="eventFk"      column="eurr_event_fk"/>
+        <id     property="eventFk"      column="eurr_event_fk"/>
+        <id     property="userFk"       column="eurr_user_fk"/>
         <result property="responseDate" column="eurr_response_date"/>
 
         <association property="user" resultMap="evntapi.rest.mapper.UserMapper.userResultMap" columnPrefix="eu_"/>
@@ -14,6 +15,7 @@
 
     <sql id="eventUserSelectCols">
         eurr.event_fk as eurr_event_fk,
+        eurr.user_fk as eurr_user_fk,
         eurr.response_date as eurr_response_date,
         <include refid="evntapi.rest.mapper.UserMapper.userSelectCols">
             <property name="prefix" value="eu_"/>
